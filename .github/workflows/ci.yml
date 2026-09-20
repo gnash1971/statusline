@@ -1,0 +1,67 @@
+# CI de la ligne de statut.
+#
+# Déclencheurs volontairement restreints, leçon de dsn-analyzer : les runners
+# Windows sont facturés x2, et un filtre `branches: '**'` avait épuisé les
+# crédits Actions du mois. Ici : push sur main, déclenchement manuel.
+#
+# Trois jobs bloquants — tests, build + format, — et clippy en non bloquant :
+# au 20/09/2026 le crate porte trois lints connus sous `-D warnings`
+# (`doc_overindented_list_items` en production, deux `assertions_on_constants`
+# dans les tests). Passer `continue-on-error` à false une fois corrigés.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+defaults:
+  run:
+    working-directory: statusline-rs
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: statusline-rs
+          shared-key: ci
+      - run: cargo test --locked --all-targets
+
+  build:
+    runs-on: windows-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: statusline-rs
+          shared-key: ci
+          save-if: false
+      - run: cargo build --locked --release
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    runs-on: windows-latest
+    needs: test
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: statusline-rs
+          shared-key: ci
+          save-if: false
+      - run: cargo clippy --locked --all-targets -- -D warnings

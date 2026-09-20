@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# Hook pre-push : protege la branche `main` contre la SUPPRESSION accidentelle.
+#
+# Conception volontairement SANS sous-processus (aucun appel `git` dans le hook) :
+# sur certaines machines Windows, le fork MSYS echoue de facon intermittente
+# (STATUS_DLL_INIT_FAILED / EAGAIN, souvent du a un antivirus). Si le hook tentait
+# de forker (ex. `git merge-base`), il pourrait faire echouer un `git push`
+# legitime. On se limite donc au test de suppression, une simple comparaison de
+# chaines qui n'exige aucun processus enfant : le hook ne peut jamais bloquer un
+# push normal.
+#
+# La protection contre le force-push (qui exigerait `git merge-base`, donc un fork)
+# n'est volontairement PAS faite ici. Pour une vraie protection force-push, passer
+# par une ruleset GitHub cote serveur (necessite un plan compatible).
+#
+# Git fournit sur stdin une ligne par reference poussee, au format :
+#   <local_ref> <local_sha> <remote_ref> <remote_sha>
+
+protected_branch='main'
+zero='0000000000000000000000000000000000000000'
+status=0
+
+while read -r local_ref local_sha remote_ref remote_sha
+do
+    case "$remote_ref" in
+        refs/heads/"$protected_branch")
+            # Suppression de la branche distante : le sha local est nul.
+            if [ "$local_sha" = "$zero" ]; then
+                echo "pre-push refuse : suppression de '$protected_branch' interdite." >&2
+                status=1
+            fi
+            ;;
+    esac
+done
+
+exit $status

@@ -1,0 +1,11 @@
+# Aucune normalisation des fins de ligne : le dépôt garde les octets du
+# workspace. Le projet ne vise que Windows, les fichiers y ont des fins de
+# ligne mixtes (statusline.ps1 en CRLF, le crate en LF, le .bat en CRLF —
+# et celui-là DOIT le rester : en LF seul, cmd se désynchronise et exécute des
+# fragments de lignes). Normaliser ferait diverger le miroir de sa source à
+# chaque déploiement, pour rien.
+* -text
+
+# Statistiques de langage GitHub : le dossier de portage est de la
+# documentation, pas du code.
+docs/** linguist-documentation

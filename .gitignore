@@ -1,0 +1,22 @@
+# Artefacts de compilation. Dans le dépôt, le crate se compile dans
+# statusline-rs/target/ ; dans le workspace d'origine, un .cargo/config.toml
+# le détourne hors du lecteur réseau — ce fichier-là n'est pas versionné.
+target/
+.cargo/
+
+# Binaire que compiler-statusline.bat rafraîchit à côté du crate, et ses
+# étapes .new / .old : un artefact reproductible, pas une source.
+/statusline.exe
+/statusline.exe.new
+/statusline.exe.old
+
+# Sauvegardes et copies de travail
+*.bak
+.backups/
+
+# IDE et système
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

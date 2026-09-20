@@ -6,6 +6,8 @@
 # chaque déploiement, pour rien.
 * -text
 
-# Statistiques de langage GitHub : le dossier de portage est de la
-# documentation, pas du code.
+# Statistiques de langage GitHub : le dossier de portage, le guide utilisateur
+# et ses figures SVG sont de la documentation, pas du code.
 docs/** linguist-documentation
+guide.html linguist-documentation
+guide/** linguist-documentation

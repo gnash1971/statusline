@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns='http://www.w3.org/2000/svg' width='676' height='295' viewBox='0 0 676 295' role='img' aria-labelledby='titre'>
+<title id='titre'>statusline — degrades</title>
+<desc> ▁▁▁▁▁▁▁▁
+ Opus 5 
+ ▔▔▔▔▔▔▔▔
+ ▁▁▁▁▁▁▁▁
+ Claude 
+ ▔▔▔▔▔▔▔▔
+ ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+ Max 5x  v2.1.278 · Opus 5 high  atelier\rust\src (main)  ctx 34% 
+ ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔</desc>
+<style>text{font-family:'Cascadia Mono','Consolas','DejaVu Sans Mono',monospace;font-size:15px;dominant-baseline:central;white-space:pre}.l{font-family:'Segoe UI',system-ui,sans-serif;font-size:12px;fill:#8b949e;dominant-baseline:auto}</style>
+<rect x='0.5' y='0.5' width='675' height='294' rx='8' fill='#0f1114' stroke='#2a2f36'/>
+<text class='l' x='14' y='26'>payload réduit au nom du modèle, sans compte lisible</text>
+<rect x='23' y='50.38' width='72' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='23' y='53' width='72' height='21' fill='rgb(59,65,75)'/>
+<path d='M 22.5,53.6 A 8.2,9.9 0 0 0 22.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 95.5,53.6 A 8.2,9.9 0 0 1 95.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<text x='32' y='63.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Opus 5 </text>
+<rect x='23' y='74' width='72' height='2.63' fill='rgb(124,132,142)'/>
+<text class='l' x='14' y='119'>payload vide : le repli « Claude », jamais une ligne blanche</text>
+<rect x='23' y='143.38' width='72' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='23' y='146' width='72' height='21' fill='rgb(59,65,75)'/>
+<path d='M 22.5,146.6 A 8.2,9.9 0 0 0 22.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 95.5,146.6 A 8.2,9.9 0 0 1 95.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<text x='32' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Claude </text>
+<rect x='23' y='167' width='72' height='2.63' fill='rgb(124,132,142)'/>
+<text class='l' x='14' y='212'>ni rate_limits, ni cache valide : les fenêtres se retirent</text>
+<rect x='23' y='236.38' width='621' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='23' y='239' width='72' height='21' fill='rgb(215,119,87)'/>
+<rect x='95' y='239' width='225' height='21' fill='rgb(59,65,75)'/>
+<rect x='320' y='239' width='234' height='21' fill='rgb(39,74,49)'/>
+<rect x='554' y='239' width='90' height='21' fill='rgb(59,65,75)'/>
+<path d='M 22.5,239.6 A 8.2,9.9 0 0 0 22.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 95.5,239.6 A 8.2,9.9 0 0 1 95.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 320.5,239.6 A 8.2,9.9 0 0 1 320.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 554.5,239.6 A 8.2,9.9 0 0 1 554.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 644.5,239.6 A 8.2,9.9 0 0 1 644.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<text x='32' y='249.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(42,13,2)' xml:space='preserve'>Max 5x </text>
+<text x='113' y='249.5' textLength='72' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>v2.1.278</text>
+<text x='185' y='249.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(124,132,142)' xml:space='preserve'> · </text>
+<text x='212' y='249.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Opus 5 </text>
+<text x='275' y='249.5' textLength='45' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>high </text>
+<text x='338' y='249.5' textLength='117' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'>atelier\rust\</text>
+<text x='455' y='249.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>src</text>
+<text x='482' y='249.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'> (</text>
+<text x='500' y='249.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>main</text>
+<text x='536' y='249.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'>) </text>
+<text x='572' y='249.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>ctx </text>
+<text x='608' y='249.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>34</text>
+<text x='626' y='249.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% </text>
+<rect x='23' y='260' width='621' height='2.63' fill='rgb(124,132,142)'/>
+</svg>

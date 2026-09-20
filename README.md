@@ -15,8 +15,14 @@ un binaire Rust en une quinzaine de millisecondes.
 ```
 
 Ici la forme dépliée, celle d'une console étroite ; sur une console large la
-capsule tient sur un rang. Sous `NO_COLOR`, tout ce qui n'est que forme se
-retire :
+capsule tient sur un rang :
+
+![La capsule sur un rang : abonnement, version et modèle, emplacement, contexte et fenêtres](guide/anatomie.svg)
+
+Le **[guide utilisateur](guide.html)** montre chaque cas d'usage — abonnements,
+marqueurs, emplacement, jauge, projections, paliers, repli en largeur — sur de
+vraies sorties du binaire, et les explique. Sous `NO_COLOR`, tout ce qui n'est
+que forme se retire :
 
 ```
 Pro v2.1.259 · Opus 5 xhigh PY_xl\PyScripts\_plus-rust_ ctx 34% · 5h ▒░ 20% → 41% 15:00 · 7j █░ 45%
@@ -82,6 +88,7 @@ pouvant être écrasé mais bien renommé.
 | `compiler-statusline.bat` | Compile et déploie ; `/test` fait précéder le dépôt des tests du crate et du harnais, `/check` compile et compare sans rien écrire |
 | `analyser-journal.ps1` | Active, arrête et dépouille le journal de diagnostic du binaire |
 | `docs/statusline-rust.md` | Le dossier du portage et de chacune de ses évolutions, daté |
+| `guide.html`, `guide/` | Le guide utilisateur illustré ; `guide/generer-guide.ps1` régénère ses figures à partir du binaire, dans un bac isolé |
 
 ## Tests
 

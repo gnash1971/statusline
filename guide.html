@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>statusline — guide utilisateur</title>
+<meta name="description" content="Guide illustré de la ligne de statut Claude Code pour Windows : chaque cas d'usage, montré et expliqué.">
+<style>
+  :root {
+    --fond: #fbfbfa;
+    --papier: #ffffff;
+    --encre: #1f2328;
+    --sourd: #59636e;
+    --trait: #d9dde2;
+    --accent: #b5573a;
+    --code-fond: #f2f3f5;
+    --figure-fond: #eceef1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fond: #14171b;
+      --papier: #1b1f24;
+      --encre: #e6e8eb;
+      --sourd: #9aa3ad;
+      --trait: #30363d;
+      --accent: #e0855f;
+      --code-fond: #23282e;
+      --figure-fond: #0f1114;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--fond);
+    color: var(--encre);
+    font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 20px 80px; }
+  header.entete { border-bottom: 1px solid var(--trait); padding-bottom: 20px; margin-bottom: 28px; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 6px; font-weight: 650; letter-spacing: -0.01em; }
+  h1 small { display: block; font-size: 1rem; font-weight: 400; color: var(--sourd); margin-top: 8px; }
+  h2 { font-size: 1.45rem; margin: 56px 0 12px; padding-top: 12px; border-top: 1px solid var(--trait); font-weight: 650; }
+  h3 { font-size: 1.1rem; margin: 30px 0 8px; font-weight: 650; }
+  p, li { max-width: 78ch; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, pre {
+    font-family: "Cascadia Mono", Consolas, "DejaVu Sans Mono", monospace;
+    font-size: 0.92em;
+  }
+  code { background: var(--code-fond); padding: 1px 5px; border-radius: 4px; }
+  pre {
+    background: var(--code-fond);
+    padding: 12px 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    line-height: 1.45;
+    max-width: 100%;
+  }
+  pre code { background: none; padding: 0; }
+  figure {
+    margin: 18px 0 26px;
+    padding: 12px;
+    background: var(--figure-fond);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    overflow-x: auto;
+  }
+  figure img { display: block; max-width: none; height: auto; }
+  figure.ajustee img { max-width: 100%; }
+  figcaption { margin-top: 10px; font-size: 0.92rem; color: var(--sourd); max-width: 90ch; }
+  figcaption strong { color: var(--encre); font-weight: 600; }
+  table { border-collapse: collapse; margin: 14px 0 22px; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 7px 14px 7px 0; border-bottom: 1px solid var(--trait); vertical-align: top; }
+  th { font-weight: 600; color: var(--sourd); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  td:last-child, th:last-child { padding-right: 0; }
+  .pastille {
+    display: inline-block; width: 0.9em; height: 0.9em; border-radius: 3px;
+    vertical-align: -0.1em; margin-right: 6px; border: 1px solid rgba(0,0,0,0.15);
+  }
+  nav.sommaire {
+    background: var(--papier);
+    border: 1px solid var(--trait);
+    border-radius: 12px;
+    padding: 16px 22px;
+    margin: 0 0 8px;
+    columns: 2;
+    column-gap: 32px;
+  }
+  nav.sommaire ol { margin: 0; padding-left: 22px; }
+  nav.sommaire li { break-inside: avoid; margin: 3px 0; }
+  .note {
+    border-left: 3px solid var(--accent);
+    padding: 8px 16px;
+    margin: 18px 0;
+    background: var(--papier);
+    border-radius: 0 8px 8px 0;
+  }
+  .note p { margin: 4px 0; }
+  kbd { font-family: inherit; border: 1px solid var(--trait); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font-size: 0.9em; }
+  footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--trait); color: var(--sourd); font-size: 0.9rem; }
+  @media (max-width: 700px) {
+    nav.sommaire { columns: 1; }
+    h1 { font-size: 1.6rem; }
+    main { padding: 16px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<header class="entete">
+  <h1>La ligne de statut, cas par cas
+    <small>Guide utilisateur de <code>statusline</code> pour Claude Code sous Windows — version 2.2.0</small>
+  </h1>
+  <p>Cette page montre tout ce que la ligne de statut peut afficher, et pourquoi elle l'affiche
+  ainsi. <strong>Toutes les figures sont de vraies sorties du programme</strong> : chaque image est
+  le rendu de <code>statusline.exe</code> sur un payload fabriqué, converti cellule par cellule en SVG
+  par <code>guide/generer-guide.ps1</code>. Rien n'est dessiné à la main ; ce que vous voyez ici est
+  ce que le binaire écrit, aux teintes près que votre terminal applique.</p>
+</header>
+
+<nav class="sommaire" aria-label="Sommaire">
+  <ol>
+    <li><a href="#lire">Lire la capsule</a></li>
+    <li><a href="#tete">La tête : l'abonnement</a></li>
+    <li><a href="#identite">L'identité : version, modèle, conduite de la session</a></li>
+    <li><a href="#emplacement">L'emplacement</a></li>
+    <li><a href="#mesures">Les mesures : contexte et fenêtres</a></li>
+    <li><a href="#paliers">Les paliers et les couleurs</a></li>
+    <li><a href="#largeur">Largeur du terminal et repli</a></li>
+    <li><a href="#sans-couleur">Sans couleur</a></li>
+    <li><a href="#degrades">Quand il manque des choses</a></li>
+    <li><a href="#installation">Installation, réglages, diagnostic</a></li>
+    <li><a href="#payload">Ce que Claude Code envoie</a></li>
+    <li><a href="#regenerer">Régénérer les figures</a></li>
+  </ol>
+</nav>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="lire">1. Lire la capsule</h2>
+
+<p>La ligne est une <strong>capsule</strong> à compartiments. De gauche à droite : sous quel régime
+on travaille, ce qui tourne, où l'on est, et ce que la session consomme. Chaque compartiment a son
+fond ; les caps arrondis, les jonctions et les deux bords fins sont tracés dans un même gris de
+contour.</p>
+
+<figure class="ajustee">
+  <img src="guide/anatomie.svg" alt="La capsule complète et ses quatre compartiments : abonnement, version et modèle, emplacement, contexte et fenêtres">
+  <figcaption><strong>Les quatre compartiments.</strong> La tête (abonnement) en terre cuite ; l'identité
+  (version, modèle, effort) et les mesures en ardoise ; l'emplacement en sauge. Le rang du dessus et
+  celui du dessous ferment le cadre : ce sont deux vraies lignes de texte, faites de huitièmes de
+  bloc, que Claude Code affiche comme le reste.</figcaption>
+</figure>
+
+<p>Trois règles suffisent à lire tout ce qui suit :</p>
+<ul>
+  <li><strong>Ce qui est ordinaire se tait, ce qui s'écarte se voit.</strong> Un mode inhabituel, une
+  mise à jour en attente, une projection au-dessus du seuil : la ligne les marque. Le reste du temps,
+  elle ne dit que le nécessaire.</li>
+  <li><strong>Ce qui manque se retire.</strong> Pas de compte lisible, pas de tête ; pas de dépôt
+  Git, pas de parenthèses ; pas de mesure, pas de segment. La capsule se resserre au lieu d'afficher
+  des vides — et elle n'est jamais blanche : une ligne vide effacerait l'affichage dans Claude Code,
+  ce qui est pire qu'une information partielle.</li>
+  <li><strong>La couleur du compartiment des mesures dit le palier.</strong> Ardoise tant que tout
+  est sous les seuils, ambre sombre dès qu'un compteur franchit son seuil d'alerte, rouge sombre au
+  seuil critique. L'œil n'a pas à lire les nombres pour savoir s'il faut lever le pied.</li>
+</ul>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="tete">2. La tête : l'abonnement</h2>
+
+<p>Le payload que Claude Code envoie à la ligne de statut ne dit rien de l'abonnement. La tête se lit
+donc dans <code>~/.claude.json</code>, sous <code>oauthAccount.organizationType</code>, complété
+pour Max par <code>organizationRateLimitTier</code> (palier 5x ou 20x). C'est l'information qui
+ouvre la ligne parce qu'elle en est le cadre : c'est elle qui décide de la taille des fenêtres de
+limitation affichées à l'autre bout.</p>
+
+<figure>
+  <img src="guide/tete-abonnements.svg" alt="Sept variantes de la tête : Pro, Max 5x, Max 20x, Team, Enterprise, un type inconnu rendu « Ultra Plus », et l'absence de tête sans compte lisible">
+  <figcaption><strong>Les types connus, et les deux cas de bord.</strong> Un type que la table ne
+  connaît pas est rendu lisible tel quel (<code>claude_ultra_plus</code> → « Ultra Plus ») : le jour
+  où un abonnement apparaît, la ligne l'affiche sans recompilation. Sans <code>oauthAccount</code>
+  lisible — fichier absent, session non connectée —, la tête ne s'affiche pas et la capsule commence
+  par l'identité.</figcaption>
+</figure>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="identite">3. L'identité : version, modèle, conduite de la session</h2>
+
+<h3>La version de Claude Code</h3>
+<p>La version affichée est celle du <strong>binaire posé sur le disque</strong>
+(<code>%USERPROFILE%\.local\bin\claude.exe</code>), et non celle que la session a chargée en
+mémoire. Une mise à jour automatique remplace le binaire sans toucher au processus en cours : tant
+que la session n'a pas été relancée, les deux diffèrent — et c'est précisément ce que le segment
+sert à voir.</p>
+
+<figure>
+  <img src="guide/version-ecart.svg" alt="Deux lignes : la version en gris quand binaire et session concordent, en cyan quand le binaire du disque est plus récent que la session">
+  <figcaption><strong>Le gris ne dit rien, le cyan dit l'écart.</strong> Même texte dans les deux
+  cas — le numéro du binaire sur le disque — mais la teinte des marqueurs quand la session tourne
+  encore sur une version antérieure : une mise à jour attend le prochain lancement. Si le binaire
+  est introuvable, la ligne se rabat sur la version de la session, sans teinte : il n'y a pas
+  d'écart constaté, seulement une inconnue.</figcaption>
+</figure>
+
+<h3>Le modèle</h3>
+<p>Le nom vient de <code>model.display_name</code>. La <em>famille</em> du modèle — lue dans
+<code>model.id</code>, à défaut dans le nom — n'est pas affichée en tant que telle, mais elle
+compte plus loin : la fenêtre de 7 jours abaisse ses seuils sous un modèle plus coûteux
+(<a href="#selon-modele">§ 5.6</a>).</p>
+
+<figure>
+  <img src="guide/modeles.svg" alt="Quatre lignes : Opus 5, Sonnet 5, Haiku 4.5, Fable 5.1">
+  <figcaption><strong>Quatre familles.</strong> Le compartiment ne change pas de teinte avec le
+  modèle : ce qui distingue une session Fable d'une session Opus, ce sont ses seuils, pas sa
+  couleur.</figcaption>
+</figure>
+
+<h3>Le contexte étendu</h3>
+<p>Quand la session tourne sur une fenêtre de contexte supérieure à 200 000 jetons, le marqueur
+« 1M » se colle au nom du modèle. Il mérite sa place : le basculement en contexte étendu divise le
+pourcentage affiché par cinq d'un rafraîchissement à l'autre, sans que rien ait été libéré. Sans
+marqueur, cette chute se lirait comme un compactage, et « ctx 12 % » ne dirait plus 12 % de quoi.
+Le marqueur lit <code>context_window_size</code>, la fenêtre <em>effective</em> — celle sur
+laquelle le pourcentage est calculé.</p>
+
+<figure>
+  <img src="guide/fenetre-1m.svg" alt="Deux lignes : contexte ordinaire à 61 %, puis « Opus 5 1M » à 12 % en contexte étendu">
+  <figcaption><strong>Même session, avant et après le basculement.</strong> Le marqueur vient avant
+  l'effort, collé au nom : la fenêtre fait partie de l'identité du modèle, et Claude Code
+  l'exprime lui-même ainsi en suffixant <code>model.id</code> de <code>[1m]</code>.</figcaption>
+</figure>
+
+<h3>L'effort de raisonnement</h3>
+<p>L'effort (<code>effort.level</code>) est accolé au nom du modèle, atténué : il qualifie le modèle
+et se consulte, là où le nom identifie la session. Il est affiché parce qu'il se règle à trois
+endroits — <code>settings.json</code>, drapeau de lancement, <code>/effort</code> en cours de
+session — dont le dernier ne laisse aucune trace ailleurs dans l'interface, et parce que c'est lui
+qui gouverne la vitesse à laquelle se remplissent les fenêtres affichées plus loin.</p>
+
+<figure>
+  <img src="guide/efforts.svg" alt="Cinq lignes, une par niveau d'effort : low, medium, high, xhigh, max">
+  <figcaption><strong>Les cinq niveaux.</strong> Absent du payload, l'effort ne s'affiche pas —
+  le segment ne réserve pas de place.</figcaption>
+</figure>
+
+<h3>Les marqueurs de mode</h3>
+<p>Deux états inhabituels de la session sont marqués dans la teinte des marqueurs, la même que le
+« 1M » et la version décalée : <strong><code>fast</code></strong> quand le mode rapide est actif
+(<code>fast_mode</code>), <strong><code>sans réflexion</code></strong> quand la réflexion étendue
+est coupée (<code>thinking.enabled = false</code>). Un mode ordinaire ne s'écrit pas.</p>
+
+<figure>
+  <img src="guide/modes.svg" alt="Trois lignes : mode rapide, réflexion coupée, puis tous les marqueurs à la fois avec le contexte étendu et l'effort xhigh">
+  <figcaption><strong>L'ordre est fixe :</strong> nom du modèle, fenêtre de contexte, effort, mode
+  rapide, réflexion coupée. Le nom et sa fenêtre disent <em>quel</em> modèle tourne ; l'effort et
+  les modes décrivent la conduite de la session, et restent groupés derrière.</figcaption>
+</figure>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="emplacement">4. L'emplacement</h2>
+
+<p>Sur un espace de travail à plusieurs projets, savoir d'où l'on parle prime sur le reste : c'est
+la seule information de la ligne que l'œil doive retrouver sans la chercher. D'où son compartiment à
+part, en sauge, et ses deux teintes : les ancêtres du chemin et les parenthèses en sourd, ce qui
+situe ; la feuille et la branche en clair, ce qui distingue.</p>
+
+<figure>
+  <img src="guide/lieux.svg" alt="Six lignes : racine du projet, sous-dossier, chemin profond replié, HEAD détachée, worktree, hors du projet">
+  <figcaption><strong>Les six formes.</strong> Le chemin est affiché <em>depuis la racine du
+  projet</em> (<code>workspace.project_dir</code>) : « src » ou « tests » seuls ne diraient pas d'où
+  l'on parle. Au-delà de trois niveaux, les ancêtres intermédiaires se replient en « … ». La
+  branche se lit dans <code>.git/HEAD</code>, en remontant depuis le répertoire courant ; une HEAD
+  détachée donne son SHA abrégé ; une session <code>--worktree</code> reçoit sa branche du payload.
+  Hors du projet, ou hors de tout dépôt, il reste la feuille seule.</figcaption>
+</figure>
+
+<p>La comparaison entre répertoire courant et racine du projet ignore la casse : sous Windows, deux
+écritures du même chemin ne diffèrent souvent que par elle, et rien ne garantit que Claude Code
+renvoie les deux dans la même.</p>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="mesures">5. Les mesures : contexte et fenêtres</h2>
+
+<p>Le dernier compartiment porte jusqu'à trois compteurs, séparés par un point médian :
+l'occupation du contexte (<code>ctx</code>), la fenêtre de 5 heures (<code>5h</code>) et la fenêtre
+de 7 jours (<code>7j</code>). Chacun a ses deux seuils — alerte, puis critique — et c'est le pire
+d'entre eux qui teinte le compartiment.</p>
+
+<h3>Le contexte</h3>
+<p><code>ctx</code> affiche <code>context_window.used_percentage</code>. Il est <strong>absent tant
+que la valeur est nulle</strong> — avant le premier appel, et de nouveau après un <code>/compact</code>
+tant que rien n'a été renvoyé — plutôt que d'afficher un « ctx 0 % » qui se lirait comme une mesure.
+Seuils : 80 % et 90 %. Les trois états sont montrés en <a href="#paliers">§ 6</a>.</p>
+
+<h3>La jauge</h3>
+<p>Chaque fenêtre précède sa valeur d'une jauge de deux cellules, à sept crans : un cran tous les
+14,3 points. Elle annonce le remplissage que le nombre chiffre, et vaut pour une valeur mémorisée ou
+estimée comme pour une mesure fraîche.</p>
+
+<figure>
+  <img src="guide/jauge.svg" alt="Sept lignes montrant les sept crans de la jauge de 0 à 86 %">
+  <figcaption><strong>Les sept crans</strong> : <code>░░</code> jusqu'à 14 %, <code>▒░</code> à
+  partir de 15, <code>▓░</code> de 29, <code>█░</code> de 43, <code>█▒</code> de 58,
+  <code>█▓</code> de 72, <code>██</code> de 86. La dernière ligne est en rouge : 86 % dépasse le
+  seuil critique de la fenêtre de 7 jours (85 %), et l'échéance apparaît.</figcaption>
+</figure>
+
+<h3>La fenêtre de 5 heures</h3>
+<p>Elle porte toujours son <strong>heure de remise à zéro</strong>, atténuée : c'est un repère de
+planification, pas une valeur à surveiller. Le mot « reset » n'y est pas — une heure qui suit un
+pourcentage, dans un segment de fenêtre, ne peut désigner que cela. Entre la valeur et l'heure peut
+s'intercaler le <strong>rythme</strong>, mesuré par la ligne elle-même.</p>
+
+<figure>
+  <img src="guide/5h-formes.svg" alt="Quatre lignes : mesure simple, projection « → 44 % », projection en alerte « → 84 % », et « épuisé » avec l'heure prévue du plafond">
+  <figcaption><strong>Les quatre formes du segment.</strong> La ligne mémorise la première
+  observation qu'elle fait de chaque fenêtre (instant et pourcentage) dans son cache ; à partir de
+  dix minutes d'observation, elle projette la consommation à la remise à zéro : « → 44 % ». Une
+  projection qui franchit un seuil prend la couleur du palier. Quand le plafond arriverait
+  <em>avant</em> la remise à zéro, la projection cède la place à l'heure prévue du plafond,
+  « épuisé 13:00 », toujours au palier critique : c'est le seul cas où la ligne annonce quelque
+  chose qui n'est pas encore arrivé.</figcaption>
+</figure>
+
+<p>Le rythme se tait dès qu'il n'a rien d'honnête à dire : observation trop courte, extrapolation
+de plus de six fois la durée observée, compteur revenu en arrière (nouvelle fenêtre), aucune
+consommation depuis l'ancrage. Une projection fausse mais affirmée coûterait plus cher qu'un segment
+absent, puisqu'elle porte la couleur du palier critique et finirait par la déprécier partout
+ailleurs.</p>
+
+<h3>La fenêtre de 7 jours</h3>
+<p>À l'échelle de la semaine, l'heure de remise à zéro n'est actionnable qu'une fois le plafond en
+vue : elle n'apparaît qu'à partir du seuil d'alerte, précédée de la date quand elle ne tombe pas
+aujourd'hui.</p>
+
+<figure>
+  <img src="guide/7j-paliers.svg" alt="Trois lignes : 45 % sans échéance, 78 % en alerte avec date et heure de remise à zéro, 88 % en critique">
+  <figcaption><strong>Sous le seuil, au seuil, au-delà.</strong> Seuils de la fenêtre hebdomadaire :
+  75 % et 85 % — plus bas que ceux de la fenêtre de 5 heures, parce qu'une semaine se subit plus
+  longtemps qu'une poignée d'heures, et qu'il faut le temps de lever le pied avant d'y être.</figcaption>
+</figure>
+
+<h3>Les marqueurs « ~ » et « ≈ »</h3>
+<p>Collé au pourcentage, à gauche, un marqueur dit quand la valeur n'est pas une mesure fraîche. Il
+qualifie la mesure, pas le compteur — d'où sa place contre le nombre.</p>
+
+<figure>
+  <img src="guide/7j-marqueurs.svg" alt="Trois lignes : valeurs mémorisées marquées d'un tilde, fenêtre propre au modèle Fable relevée par /usage, et valeur estimée marquée d'un « presque égal »">
+  <figcaption><strong>Trois provenances.</strong> <code>~</code> : la valeur vient du cache de la
+  ligne — celle d'avant la première réponse de la session, ou un relevé de <code>/usage</code> vieux
+  de plus d'une heure. Ancienne, pas fausse. Deuxième ligne : sous Fable, la fenêtre <em>propre au
+  modèle</em> — la « Fable limit » de l'écran <code>/usage</code>, que Claude Code persiste dans
+  <code>~/.claude.json</code> — prend la place de la fenêtre globale, sauf quand celle-ci est en
+  alerte et plus remplie. <code>≈</code> : ce relevé ne bouge qu'à l'ouverture de
+  <code>/usage</code>, mais la fenêtre globale du payload est fraîche à chaque réponse ; ce qu'elle a
+  pris depuis le relevé, la fenêtre du modèle l'a pris aussi, au rapport des deux budgets, et la
+  ligne l'avance d'autant. Sous l'un comme sous l'autre marqueur, le rythme se tait : projeter à
+  partir d'une valeur déjà périmée, ou déjà estimée, empilerait deux approximations.</figcaption>
+</figure>
+
+<h3 id="selon-modele">Les seuils selon le modèle</h3>
+<p>Le budget hebdomadaire est unique quel que soit le modèle, mais il se vide au prix du jeton : à
+travail égal, Fable 5.1 consomme deux fois ce qu'Opus 5 consomme. Sous un modèle plus coûteux, la
+ligne abaisse les seuils de la fenêtre de 7 jours de sorte que l'alerte laisse le même temps de
+réaction : la réserve entre le seuil et le plafond est doublée, 75 % devient 50 %, 85 % devient
+70 %. Un facteur inférieur à 1 ne relève jamais rien : une session Sonnet ne rend pas moins cher ce
+que Fable a déjà consommé la même semaine.</p>
+
+<figure>
+  <img src="guide/7j-selon-modele.svg" alt="Trois lignes : Opus 5 à 55 % sans alerte, Fable 5.1 à 55 % en alerte, Fable 5.1 à 72 % en critique">
+  <figcaption><strong>Même pourcentage, deux lectures.</strong> À 55 %, la fenêtre est ordinaire sous
+  Opus et déjà en alerte sous Fable ; à 72 %, Fable est au palier critique. La fenêtre de 5 heures,
+  elle, garde ses seuils : elle se réancre d'elle-même toutes les quelques heures.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th>Famille</th><th>Facteur</th><th>Seuils 7 j</th></tr></thead>
+  <tbody>
+    <tr><td>Fable, Mythos</td><td>2</td><td>50 % · 70 %</td></tr>
+    <tr><td>Opus</td><td>1</td><td>75 % · 85 %</td></tr>
+    <tr><td>Sonnet</td><td>0,4</td><td>75 % · 85 % (jamais relevés)</td></tr>
+    <tr><td>Haiku</td><td>0,2</td><td>75 % · 85 % (jamais relevés)</td></tr>
+    <tr><td>hors table</td><td>1</td><td>75 % · 85 %</td></tr>
+  </tbody>
+</table>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="paliers">6. Les paliers et les couleurs</h2>
+
+<p>Le corps de la capsule est neutre ; c'est le palier qui colore. Le compartiment des mesures prend
+le fond du pire palier qu'il porte, et le compteur fautif prend l'encre correspondante — en gras au
+palier critique.</p>
+
+<figure class="ajustee">
+  <img src="guide/paliers.svg" alt="Trois lignes complètes : contexte à 34 % en ardoise, à 82 % en ambre, à 93 % en rouge sombre avec la valeur en gras">
+  <figcaption><strong>Le même compartiment sous ses trois fonds.</strong> Le reste de la capsule ne
+  bouge pas : la tête, l'identité et l'emplacement ne portent aucun palier.</figcaption>
+</figure>
+
+<table>
+  <thead><tr><th>Compteur</th><th>Alerte</th><th>Critique</th><th>Réaction attendue</th></tr></thead>
+  <tbody>
+    <tr><td>ctx</td><td>80 %</td><td>90 %</td><td>compacter, ou terminer proprement</td></tr>
+    <tr><td>5h</td><td>80 %</td><td>90 %</td><td>lever le pied quelques heures</td></tr>
+    <tr><td>7j</td><td>75 %</td><td>85 %</td><td>lever le pied pour la semaine (50 / 70 sous Fable)</td></tr>
+    <tr><td>projection →</td><td colspan="2">mêmes seuils que le compteur</td><td>anticiper</td></tr>
+    <tr><td>épuisé</td><td colspan="2">toujours critique</td><td>s'arrêter avant l'heure annoncée</td></tr>
+  </tbody>
+</table>
+
+<table>
+  <thead><tr><th>Teinte</th><th>Rôle</th><th>RVB</th></tr></thead>
+  <tbody>
+    <tr><td><span class="pastille" style="background:rgb(215,119,87)"></span>terre cuite</td><td>fond de la tête</td><td>215 · 119 · 87</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(59,65,75)"></span>ardoise</td><td>fond de l'identité et des mesures</td><td>59 · 65 · 75</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(39,74,49)"></span>sauge</td><td>fond de l'emplacement</td><td>39 · 74 · 49</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(74,61,28)"></span>ambre sombre</td><td>fond des mesures en alerte</td><td>74 · 61 · 28</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(83,40,37)"></span>rouge sombre</td><td>fond des mesures au critique</td><td>83 · 40 · 37</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(124,132,142)"></span>gris de contour</td><td>caps, jonctions, bords, points séparateurs</td><td>124 · 132 · 142</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(147,197,208)"></span>cyan des marqueurs</td><td>1M, fast, sans réflexion, version décalée</td><td>147 · 197 · 208</td></tr>
+  </tbody>
+</table>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="largeur">7. Largeur du terminal et repli</h2>
+
+<p>Claude Code ne coupe pas une ligne plus large que son terminal : il la <em>replie</em> sur le
+rang suivant, caps compris, et la forme se casse. La ligne mesure donc elle-même la largeur de la
+console — celle du terminal, retrouvée à travers le pseudo-terminal que Windows lui donne — et se
+replie d'elle-même, à une frontière propre, dès qu'un rang dépasserait la capacité (la largeur
+moins une cellule de marge).</p>
+
+<figure class="ajustee">
+  <img src="guide/largeur-120.svg" alt="À 120 colonnes, la capsule tient sur un rang">
+  <figcaption><strong>120 colonnes :</strong> une seule capsule.</figcaption>
+</figure>
+<figure class="ajustee">
+  <img src="guide/largeur-90.svg" alt="À 90 colonnes, les mesures passent dans une seconde capsule">
+  <figcaption><strong>90 colonnes :</strong> les mesures ne tiennent plus à la suite de
+  l'emplacement, elles ouvrent une deuxième capsule. La coupe se fait d'abord <em>entre
+  compartiments</em>.</figcaption>
+</figure>
+<figure class="ajustee">
+  <img src="guide/largeur-60.svg" alt="À 60 colonnes, trois capsules : identité, emplacement, mesures">
+  <figcaption><strong>60 colonnes :</strong> trois capsules, une par groupe. Quand un compartiment
+  seul déborde encore, la coupe descend <em>entre segments</em>, chaque morceau gardant la teinte
+  de son compartiment ; un segment seul plus large que la console s'émet tel quel, il n'y a plus
+  rien à faire.</figcaption>
+</figure>
+
+<p>Le nombre de rangs croît donc avec l'étroitesse de la fenêtre, comme le ferait l'enroulement de
+Claude Code — mais chaque rang est une capsule entière, caps et cadre compris. Sans console à
+mesurer (un autre lanceur, un harnais qui redirige tout), la ligne garde sa disposition fixe sur un
+rang.</p>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="sans-couleur">8. Sans couleur</h2>
+
+<p>La variable d'environnement <code>NO_COLOR</code>, définie et non vide, retire tout ce qui n'est
+que forme : fonds, caps, jonctions, bords, liserés, saut de ligne. Il reste le contenu, sur une
+seule ligne, que le terminal enroule s'il le faut.</p>
+
+<figure class="ajustee">
+  <img src="guide/sans-couleur.svg" alt="La même ligne sous NO_COLOR : un seul rang de texte, sans fond ni cadre">
+  <figcaption><strong>La ligne nue.</strong> C'est, octet pour octet, la ligne d'avant la capsule —
+  et celle que le script PowerShell d'origine, <code>statusline.ps1</code>, produit encore : le
+  harnais de non-régression compare les deux sous <code>NO_COLOR</code>.</figcaption>
+</figure>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="degrades">9. Quand il manque des choses</h2>
+
+<p>Chaque segment sait se retirer, et la ligne assemblée passe par un dernier filtre : si elle est
+blanche, le nom du modèle la remplace ; s'il manque aussi, « Claude ». Le programme rend toujours 0 :
+une sortie vide ou un code non nul effacerait l'affichage dans l'interface.</p>
+
+<figure>
+  <img src="guide/degrades.svg" alt="Trois lignes : « Opus 5 » seul, « Claude » seul, et une capsule sans fenêtres">
+  <figcaption><strong>Trois dégradés.</strong> Un payload réduit au nom du modèle, sans binaire ni
+  compte lisibles : une capsule d'un seul compartiment. Un payload vide : le repli. Un payload sans
+  <code>rate_limits</code>, comme avant la première réponse d'une session, et un cache dont la
+  fenêtre est déjà passée : les fenêtres se retirent, le contexte reste.</figcaption>
+</figure>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="installation">10. Installation, réglages, diagnostic</h2>
+
+<p>Le binaire se déclare dans <code>%USERPROFILE%\.claude\settings.json</code> :</p>
+<pre><code>"statusLine": {
+  "type": "command",
+  "command": "\"C:/chemin/vers/statusline.exe\"",
+  "padding": 0,
+  "refreshInterval": 1
+}</code></pre>
+
+<p>Le fichier <a href="README.md"><code>README.md</code></a> du dépôt donne les deux voies —
+binaire de la dernière Release, ou <code>cargo build --release</code> — et
+<code>compiler-statusline.bat</code> enchaîne compilation et dépôt du binaire dans
+<code>%USERPROFILE%\.claude</code>.</p>
+
+<div class="note">
+  <p><strong>Windows Terminal est conseillé.</strong> Aucune police du poste n'a besoin de porter les
+  arcs Powerline (<code>U+E0B5</code>, <code>U+E0B7</code>) ni les huitièmes de bloc du cadre :
+  Windows Terminal les trace lui-même, et le harnais l'a vérifié sans réglage particulier. Dans un
+  autre terminal, les arcs peuvent manquer ; le contenu, lui, reste lisible.</p>
+</div>
+
+<h3>Où vit l'état</h3>
+<ul>
+  <li><code>%LOCALAPPDATA%\claude-code\statusline-cache.json</code> — la dernière valeur de chaque
+  fenêtre et l'ancrage de mesure du rythme. C'est ce cache qui permet d'afficher « ~ » avant la
+  première réponse d'une session, et de projeter la consommation.</li>
+  <li><code>~/.claude.json</code> — lu seulement : l'abonnement, et le dernier relevé de
+  <code>/usage</code> (<code>cachedUsageUtilization</code>) pour la fenêtre propre au modèle.</li>
+</ul>
+
+<h3>Quand la ligne clignote</h3>
+<p><code>analyser-journal.ps1</code> répond à une seule question : le programme s'est-il tu, ou le
+clignotement vient-il d'ailleurs ? <code>-Activer</code> pose un fichier témoin, et le binaire
+journalise chaque lancement tant qu'il existe ; <code>-Arreter</code> le retire ; sans drapeau, le
+script dépouille le journal et nomme les intervalles trop longs — un lancement manquant est une
+ligne effacée, une cadence régulière disculpe le programme. <code>-Autour HH:mm:ss</code> montre
+les lancements autour d'un clignotement observé à l'œil.</p>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="payload">11. Ce que Claude Code envoie</h2>
+
+<p>À chaque rafraîchissement, Claude Code lance le binaire et lui écrit un objet JSON sur l'entrée
+standard. Les champs lus :</p>
+
+<table>
+  <thead><tr><th>Champ</th><th>Segment</th><th>Remarque</th></tr></thead>
+  <tbody>
+    <tr><td><code>model.display_name</code>, <code>model.id</code></td><td>modèle, famille</td><td>l'identifiant porte le suffixe <code>[1m]</code> en contexte étendu</td></tr>
+    <tr><td><code>version</code></td><td>version</td><td>repli, et comparaison au binaire du disque</td></tr>
+    <tr><td><code>workspace.current_dir</code>, <code>workspace.project_dir</code>, <code>cwd</code></td><td>emplacement</td><td><code>cwd</code> double <code>current_dir</code></td></tr>
+    <tr><td><code>worktree.branch</code></td><td>branche</td><td>sessions <code>--worktree</code> seulement</td></tr>
+    <tr><td><code>context_window.used_percentage</code>, <code>context_window.context_window_size</code></td><td>ctx, marqueur 1M</td><td>nul avant le premier appel</td></tr>
+    <tr><td><code>rate_limits.five_hour</code>, <code>rate_limits.seven_day</code></td><td>5h, 7j</td><td><code>used_percentage</code> et <code>resets_at</code> (Unix, ms ou ISO 8601)</td></tr>
+    <tr><td><code>effort.level</code></td><td>effort</td><td>chaîne non vide</td></tr>
+    <tr><td><code>fast_mode</code>, <code>thinking.enabled</code></td><td>marqueurs</td><td>booléens, contrôlés en type</td></tr>
+  </tbody>
+</table>
+
+<p>Un exemple fabriqué, tel que le générateur de ce guide en soumet :</p>
+<pre><code>{
+  "version": "2.1.278",
+  "model": { "id": "claude-opus-5", "display_name": "Opus 5" },
+  "workspace": { "current_dir": "D:\\projets\\atelier\\rust\\src", "project_dir": "D:\\projets\\atelier" },
+  "effort": { "level": "high" },
+  "context_window": { "used_percentage": 34 },
+  "rate_limits": {
+    "five_hour": { "used_percentage": 20, "resets_at": 1789907000 },
+    "seven_day": { "used_percentage": 45, "resets_at": 1790240400 }
+  }
+}</code></pre>
+
+<!-- ------------------------------------------------------------------ -->
+<h2 id="regenerer">12. Régénérer les figures</h2>
+
+<p>Les images de ce guide sont produites par <code>guide/generer-guide.ps1</code> (PowerShell 7).
+Le script fabrique un bac isolé sous <code>%TEMP%</code> — dépôts Git factices, configurations
+d'abonnement, relevés de <code>/usage</code>, cache — et n'approche ni le compte, ni le cache, ni les
+dépôts du poste. Chaque cas est exécuté sous une console cachée redimensionnée à la largeur voulue,
+ce qui donne les vrais replis à 120, 90 et 60 colonnes ; la sortie ANSI est ensuite convertie en
+SVG, les arcs et les blocs tracés en formes pour ne pas dépendre des polices du lecteur.</p>
+
+<pre><code>pwsh -File guide\generer-guide.ps1            # toutes les figures, dans guide\
+pwsh -File guide\generer-guide.ps1 -Lister    # les cas en texte brut, sans écrire
+pwsh -File guide\generer-guide.ps1 -Filtre 'largeur-*' -Exe C:\chemin\statusline.exe</code></pre>
+
+<p>Les heures affichées dans les figures sont celles du moment de la génération ; les pourcentages,
+les projections et les paliers, eux, sont fixés par les cas et ne bougent pas d'une génération à
+l'autre. Après une évolution du binaire, régénérer puis relire ce guide : une figure qui ne
+correspond plus au texte signale une évolution à documenter.</p>
+
+<footer>
+  <p><code>statusline</code> 2.2.0 — <a href="https://github.com/gnash1971/statusline">github.com/gnash1971/statusline</a>.
+  L'histoire du portage et de chacune de ses décisions est dans <code>docs/statusline-rust.md</code>.</p>
+</footer>
+
+</main>
+</body>
+</html>

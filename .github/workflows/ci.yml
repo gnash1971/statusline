@@ -17,9 +17,15 @@
 # épinglée par le SHA complet de son commit, la version en commentaire — le
 # dépôt exige cet épinglage (`sha_pinning_required`) et n'autorise que les
 # actions GitHub, `dtolnay/rust-toolchain` et `Swatinem/rust-cache`. Dependabot
-# (`.github/dependabot.yml`) fait suivre les épingles de checkout et de
-# rust-cache ; rust-toolchain n'a ni tag ni release, son épingle se met à jour
-# à la main. Épinglé par SHA, rust-toolchain exige l'entrée `toolchain`.
+# (`.github/dependabot.yml`) signale par pull request les nouvelles versions
+# de checkout et de rust-cache ; rust-toolchain n'a ni tag ni release, son
+# épingle se met à jour à la main. Épinglé par SHA, rust-toolchain exige
+# l'entrée `toolchain`.
+#
+# Une PR Dependabot ne se fusionne pas ici : ce fichier a sa source dans le
+# workspace qui alimente le dépôt, et un déploiement défait ce que le dépôt
+# seul aurait changé (le script s'y refuse, code 2). La mise à jour s'applique
+# à la source, se déploie, et la PR se ferme d'elle-même.
 #
 # actions/checkout en v5 : la v4 déclare Node 20, que les runners exécutent de
 # force sur Node 24 depuis septembre 2025 avec un avertissement à chaque job ;

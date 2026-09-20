@@ -114,9 +114,10 @@ La CI (`.github/workflows/ci.yml`) rejoue `cargo test`, `cargo build
 sur Windows à chaque push sur `main` et sur chaque pull request ; les quatre
 sont bloquants. Le jeton du workflow est en lecture seule, chaque action est
 épinglée par le SHA de son commit — le dépôt l'exige — et Dependabot
-(`.github/dependabot.yml`) fait suivre épingles et dépendances Cargo, une
-pull request hebdomadaire par écosystème. CodeQL analyse les workflows et le
-crate à chaque push.
+(`.github/dependabot.yml`) signale par une pull request hebdomadaire les
+nouvelles versions des actions et des dépendances Cargo ; la mise à jour est
+appliquée à la source du dépôt puis déployée, et la PR se ferme d'elle-même.
+CodeQL analyse les workflows à chaque push.
 
 ## Sécurité
 

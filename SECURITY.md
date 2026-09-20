@@ -46,7 +46,7 @@ et n'écrit rien ailleurs.
   clé publique du compte dans votre `allowed_signers`.
 - La CI (`.github/workflows/ci.yml`) tourne avec un jeton en lecture seule,
   n'exécute que des actions épinglées par SHA, et le dépôt exige cet
-  épinglage ; CodeQL analyse les workflows et le crate.
+  épinglage ; CodeQL analyse les workflows.
 
 Le binaire n'est pas signé Authenticode : SmartScreen peut avertir au premier
 lancement d'un téléchargement. Compiler soi-même (`cargo build --release`

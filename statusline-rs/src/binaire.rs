@@ -64,6 +64,19 @@ fn large(texte: &str) -> Vec<u16> {
 /// `read_unaligned`, qui ne suppose rien, et la chaîne est copiée mot par mot
 /// plutôt que vue en place par `from_raw_parts`, qui exige lui aussi
 /// l'alignement.
+///
+/// # Lecture bornée — 20/09/2026
+///
+/// CodeQL (`rust/access-invalid-pointer`) signalait la lecture à travers le
+/// pointeur que `VerQueryValueW` rend : l'analyseur ne connaît pas le contrat
+/// de l'API — un pointeur dans le bloc qu'on lui a passé — et voit un pointeur
+/// né nul, passé à une fonction opaque, puis déréférencé. Plutôt que d'écarter
+/// l'alerte, les lectures ne passent plus par ce pointeur : il n'est utilisé
+/// que comme **adresse**, convertie en décalage depuis le début du bloc
+/// ([`decalage_dans_bloc`]), et les octets sont lus par indexation bornée dans
+/// le `Vec<u32>` lui-même ([`mot_a`]). Plus aucun `unsafe` à la lecture, et une
+/// adresse qui sortirait du bloc — ce que l'API ne fait pas — rend `None` au
+/// lieu d'être suivie.
 fn version_produit(chemin: &Path) -> Option<String> {
     use windows_sys::Win32::Storage::FileSystem::{
         GetFileVersionInfoSizeW, GetFileVersionInfoW, VerQueryValueW,
@@ -98,13 +111,11 @@ fn version_produit(chemin: &Path) -> Option<String> {
     if trouve == 0 || n < 4 || trad.is_null() {
         return None;
     }
-    // SAFETY : l'API garantit au moins `n` octets lisibles derrière `trad`, et
-    // `n >= 4` couvre les deux `u16` lus ; `read_unaligned` ne suppose aucun
-    // alignement.
-    let (langue, page) = unsafe {
-        let mots = trad.cast::<u16>();
-        (mots.read_unaligned(), mots.add(1).read_unaligned())
-    };
+    // Le pointeur rendu n'est qu'une adresse dans `bloc` : les deux mots se
+    // lisent par indexation bornée, à partir de son décalage.
+    let debut = decalage_dans_bloc(&bloc, trad)?;
+    let langue = mot_a(&bloc, debut)?;
+    let page = mot_a(&bloc, debut + 2)?;
 
     let sous_bloc = format!(
         "\\StringFileInfo\\{:04x}{:04x}\\ProductVersion",
@@ -127,15 +138,46 @@ fn version_produit(chemin: &Path) -> Option<String> {
     }
 
     // Pour une chaîne, `longueur` compte des caractères UTF-16, terminateur
-    // compris. La chaîne est copiée mot par mot jusqu'au premier zéro.
-    let mots = valeur.cast::<u16>();
+    // compris. La chaîne est copiée mot par mot jusqu'au premier zéro, sans
+    // jamais sortir du bloc : une longueur qui le dépasserait tronque la
+    // copie, elle ne lit pas au-delà.
+    let debut = decalage_dans_bloc(&bloc, valeur)?;
     let brut: Vec<u16> = (0..longueur as usize)
-        // SAFETY : l'API garantit `longueur` caractères lisibles derrière
-        // `valeur`, et l'indice reste dans cette borne.
-        .map(|i| unsafe { mots.add(i).read_unaligned() })
+        .map_while(|i| mot_a(&bloc, debut + 2 * i))
         .take_while(|&c| c != 0)
         .collect();
     Some(String::from_utf16_lossy(&brut))
+}
+
+/// Décalage, en octets depuis le début du bloc, de l'adresse que
+/// `VerQueryValueW` a rendue — ou `None` si elle tombe hors du bloc.
+///
+/// L'API désigne toujours l'intérieur du bloc qu'on lui a passé ; la borne
+/// n'est là que pour que rien ne dépende de cette promesse. Le pointeur n'est
+/// jamais déréférencé : seule son adresse est comparée à celle du bloc.
+fn decalage_dans_bloc(bloc: &[u32], adresse: *const core::ffi::c_void) -> Option<usize> {
+    let debut = bloc.as_ptr() as usize;
+    let decalage = (adresse as usize).checked_sub(debut)?;
+    (decalage < std::mem::size_of_val(bloc)).then_some(decalage)
+}
+
+/// Octet du bloc au décalage donné, ou `None` s'il déborde.
+///
+/// Le bloc est tenu en mots de 32 bits pour l'alignement ; l'octet se prend
+/// dans la représentation mémoire du mot (`to_ne_bytes`), ce qui rend la
+/// lecture identique à ce que l'API a écrit, quel que soit le boutisme.
+fn octet_a(bloc: &[u32], decalage: usize) -> Option<u8> {
+    Some(bloc.get(decalage / 4)?.to_ne_bytes()[decalage % 4])
+}
+
+/// Mot UTF-16 du bloc qui commence au décalage donné, ou `None` s'il déborde.
+///
+/// Les deux octets peuvent chevaucher deux mots de 32 bits : chacun est pris
+/// séparément, sans exigence d'alignement.
+fn mot_a(bloc: &[u32], decalage: usize) -> Option<u16> {
+    let bas = octet_a(bloc, decalage)?;
+    let haut = octet_a(bloc, decalage.checked_add(1)?)?;
+    Some(u16::from_ne_bytes([bas, haut]))
 }
 
 /// Ramène une chaîne de version Windows à l'écriture de Claude Code.
@@ -198,6 +240,52 @@ mod tests {
         assert_eq!(normaliser_version("2.1.x.0").as_deref(), Some("2.1.x.0"));
         assert_eq!(normaliser_version("beta.0").as_deref(), Some("beta.0"));
         assert_eq!(normaliser_version("   "), None);
+    }
+
+    /// Les lectures bornées dans le bloc en mots de 32 bits : octet et mot
+    /// UTF-16 à tout décalage, chevauchement de deux mots compris, et `None`
+    /// dès que la lecture déborde — jamais une panique.
+    #[test]
+    fn le_bloc_se_lit_par_indexation_bornee() {
+        // Octets 1..=8 en mémoire, quel que soit le boutisme.
+        let bloc = [
+            u32::from_ne_bytes([1, 2, 3, 4]),
+            u32::from_ne_bytes([5, 6, 7, 8]),
+        ];
+        assert_eq!(octet_a(&bloc, 0), Some(1));
+        assert_eq!(octet_a(&bloc, 3), Some(4));
+        assert_eq!(octet_a(&bloc, 4), Some(5));
+        assert_eq!(octet_a(&bloc, 7), Some(8));
+        assert_eq!(octet_a(&bloc, 8), None);
+
+        assert_eq!(mot_a(&bloc, 0), Some(u16::from_ne_bytes([1, 2])));
+        // À cheval sur les deux mots de 32 bits.
+        assert_eq!(mot_a(&bloc, 3), Some(u16::from_ne_bytes([4, 5])));
+        assert_eq!(mot_a(&bloc, 6), Some(u16::from_ne_bytes([7, 8])));
+        // Le second octet déborderait.
+        assert_eq!(mot_a(&bloc, 7), None);
+        assert_eq!(mot_a(&bloc, usize::MAX), None);
+        assert_eq!(mot_a(&[], 0), None);
+    }
+
+    /// Le pointeur rendu par l'API n'est qu'une adresse : dans le bloc, elle
+    /// devient un décalage ; avant ou après lui, `None`. Les pointeurs sont
+    /// fabriqués par arithmétique enveloppante et jamais déréférencés.
+    #[test]
+    fn une_adresse_hors_du_bloc_ne_donne_aucun_decalage() {
+        let bloc = [0u32; 3];
+        let base = bloc.as_ptr().cast::<u8>();
+        let dans = |octets: usize| base.wrapping_add(octets).cast::<core::ffi::c_void>();
+        assert_eq!(decalage_dans_bloc(&bloc, dans(0)), Some(0));
+        assert_eq!(decalage_dans_bloc(&bloc, dans(5)), Some(5));
+        assert_eq!(decalage_dans_bloc(&bloc, dans(11)), Some(11));
+        // Premier octet après le bloc, puis un octet avant.
+        assert_eq!(decalage_dans_bloc(&bloc, dans(12)), None);
+        assert_eq!(
+            decalage_dans_bloc(&bloc, base.wrapping_sub(1).cast::<core::ffi::c_void>()),
+            None
+        );
+        assert_eq!(decalage_dans_bloc(&bloc, std::ptr::null()), None);
     }
 
     /// Lecture réelle d'un bloc de version, sur une bibliothèque système

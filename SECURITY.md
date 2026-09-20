@@ -42,11 +42,11 @@ et n'écrit rien ailleurs.
 - Les Releases sont immuables : ni l'asset ni le tag ne changent après
   publication.
 - Les commits de `main` et les tags `v*` sont signés (clé SSH du compte,
-  « Verified » sur GitHub) ; `git verify-tag v2.2.0` après clonage, avec la
+  « Verified » sur GitHub) ; `git verify-tag vX.Y.Z` après clonage, avec la
   clé publique du compte dans votre `allowed_signers`.
 - La CI (`.github/workflows/ci.yml`) tourne avec un jeton en lecture seule,
   n'exécute que des actions épinglées par SHA, et le dépôt exige cet
-  épinglage ; CodeQL analyse les workflows.
+  épinglage ; CodeQL analyse les workflows et le crate (Rust) à chaque push.
 
 Le binaire n'est pas signé Authenticode : SmartScreen peut avertir au premier
 lancement d'un téléchargement. Compiler soi-même (`cargo build --release`

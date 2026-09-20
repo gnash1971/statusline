@@ -56,7 +56,7 @@ Sans compiler : la dernière Release porte le binaire x64,
 [`statusline.exe`](https://github.com/gnash1971/statusline/releases/latest/download/statusline.exe),
 avec son empreinte `statusline.exe.sha256` — `(Get-FileHash statusline.exe).Hash`
 doit la retrouver. Les Releases sont immuables et leur tag est signé
-(`git verify-tag v2.2.0` après clonage). Avec Rust stable :
+(`git verify-tag vX.Y.Z` après clonage). Avec Rust stable :
 
 ```bat
 cd statusline-rs
@@ -117,7 +117,7 @@ sont bloquants. Le jeton du workflow est en lecture seule, chaque action est
 (`.github/dependabot.yml`) signale par une pull request hebdomadaire les
 nouvelles versions des actions et des dépendances Cargo ; la mise à jour est
 appliquée à la source du dépôt puis déployée, et la PR se ferme d'elle-même.
-CodeQL analyse les workflows à chaque push.
+CodeQL analyse les workflows et le crate à chaque push.
 
 ## Sécurité
 
@@ -131,8 +131,10 @@ signature exigée) ; les commits et les tags sont signés.
 
 ## État
 
-Version 2.2.0 — capsule cadrée sur trois rangs. L'histoire, les mesures et les
-décisions sont dans `docs/statusline-rust.md`.
+Version 2.2.1 — lecture bornée du bloc de version (une alerte CodeQL fermée par
+le code plutôt qu'écartée) ; 2.2.0 avait apporté la capsule cadrée sur trois
+rangs. L'histoire, les mesures et les décisions sont dans
+`docs/statusline-rust.md`.
 
 ## Licence
 

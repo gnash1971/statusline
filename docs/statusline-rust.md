@@ -1988,3 +1988,56 @@ les images Sixel. Idée notée, non instruite.
   scratchpad de la session pour l'après). Si un jour les segments prennent
   leur décision de coloration en paramètre comme `sortie.rs`, trois de ces cas
   pourront devenir des tests de bout en bout.
+
+## 24. La lecture bornée du bloc de version — 20/09/2026
+
+L'après-midi du 20/09/2026, la revue de sécurité du dépôt public (chantier
+`.claude\CHANTIER-statusline-securite-depot.md`) a activé CodeQL sur le
+crate. Première analyse Rust, vingt-six règles, **une alerte**, niveau
+*high* : `rust/access-invalid-pointer` sur `binaire.rs`, la lecture de la
+langue et de la page de codes derrière le pointeur que `VerQueryValueW`
+rend — « This operation dereferences a pointer that may be invalid. »
+
+### Ce que l'analyseur voit, et ce qui est vrai
+
+Le pointeur naît nul (`null_mut()`), part dans une fonction opaque par
+`&mut`, revient, et se fait déréférencer après trois gardes — `trouve != 0`,
+`n >= 4`, `!trad.is_null()`. L'analyseur ne connaît pas le contrat de
+l'API, qui désigne toujours l'intérieur du bloc qu'on lui a passé ; il ne
+peut donc pas prouver la validité, et il le dit. Le code était sain, le
+commentaire `SAFETY` du §21.3 disait pourquoi ; l'alerte était, au sens
+strict, un faux positif. La seconde lecture du même genre — la chaîne
+`ProductVersion`, copiée mot par mot derrière `valeur` — n'a pas été
+signalée, sans raison visible : même origine, même forme.
+
+### Fermer par le code plutôt qu'écarter
+
+L'utilisateur a choisi de durcir plutôt que de rejeter l'alerte, et de le
+livrer aussitôt. La règle nouvelle : **le pointeur rendu par l'API n'est
+qu'une adresse**. `decalage_dans_bloc` la compare à celle du `Vec<u32>` et
+en fait un décalage en octets, `None` si elle tombe hors du bloc — ce que
+l'API ne fait pas, mais rien n'en dépend plus. `octet_a` prend l'octet dans
+la représentation mémoire du mot de 32 bits (`to_ne_bytes`), `mot_a`
+assemble deux octets en `u16` (`from_ne_bytes`), à cheval sur deux mots
+s'il le faut, chaque accès borné par `get`. La chaîne se copie par
+`map_while` : une longueur qui dépasserait le bloc tronque, elle ne lit
+pas au-delà. Plus aucun `unsafe` à la lecture — il n'en reste que sur les
+trois appels Win32, incompressibles. L'alignement du §21.3 est conservé (le
+bloc reste en `u32`) ; ce qui change, c'est que plus rien n'est lu à
+travers un pointeur que le crate n'a pas fabriqué lui-même.
+
+Deux tests neufs : les lectures bornées sur un bloc de deux mots (octets à
+tout décalage, mot à cheval, `None` au débordement, `usize::MAX`, bloc
+vide), et le décalage d'adresses fabriquées par arithmétique enveloppante
+(dans le bloc, premier octet après, un octet avant, nul) — jamais
+déréférencées. Le test de `kernel32.dll` du §21.3 couvre l'aller-retour
+réel. 91 tests, clippy `-D warnings` et `fmt` propres.
+
+### Version 2.2.1
+
+Première Release publiée sous le régime posé le jour même : commit et tag
+signés, Release **immuable**, `statusline.exe.sha256` à côté de
+l'exécutable et empreinte dans les notes. Livrée par `deploy-statusline.bat`
+sans drapeau — incrément patch *tag-aware*, `compiler-statusline.bat /test`,
+harnais, reflet, push, Release. Le comportement visible ne change pas : même
+chaîne de version lue, même segment.

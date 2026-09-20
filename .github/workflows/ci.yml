@@ -1,13 +1,25 @@
 # CI de la ligne de statut.
 #
-# Déclencheurs volontairement restreints, leçon de dsn-analyzer : les runners
-# Windows sont facturés x2, et un filtre `branches: '**'` avait épuisé les
-# crédits Actions du mois. Ici : push sur main, déclenchement manuel.
+# Déclencheurs : push sur main, pull request vers main, déclenchement manuel.
+# Le dépôt est public : les runners standard y sont gratuits, y compris
+# Windows. (La restriction héritée de dsn-analyzer — dépôt privé, minutes
+# Windows facturées ×2, un filtre `branches: '**'` avait épuisé le crédit du
+# mois — n'a pas d'objet ici.) Les pull requests de Dependabot passent donc
+# par les trois jobs avant fusion.
 #
 # Trois jobs, tous bloquants : tests, build + format, clippy sous `-D warnings`
 # sur toutes les cibles (tests compris). Clippy a été non bloquant le temps du
 # premier push, jusqu'à la correction des trois lints qu'il relevait — le
 # 20/09/2026, le jour même.
+#
+# Sécurité de la chaîne (20/09/2026) : le jeton du workflow est en lecture
+# seule (`permissions`, en plus du défaut du dépôt) ; chaque action est
+# épinglée par le SHA complet de son commit, la version en commentaire — le
+# dépôt exige cet épinglage (`sha_pinning_required`) et n'autorise que les
+# actions GitHub, `dtolnay/rust-toolchain` et `Swatinem/rust-cache`. Dependabot
+# (`.github/dependabot.yml`) fait suivre les épingles de checkout et de
+# rust-cache ; rust-toolchain n'a ni tag ni release, son épingle se met à jour
+# à la main. Épinglé par SHA, rust-toolchain exige l'entrée `toolchain`.
 #
 # actions/checkout en v5 : la v4 déclare Node 20, que les runners exécutent de
 # force sur Node 24 depuis septembre 2025 avec un avertissement à chaque job ;
@@ -17,7 +29,17 @@ name: ci
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Un push qui en suit un autre sur la même référence annule le run dépassé.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   CARGO_TERM_COLOR: always
@@ -30,9 +52,11 @@ jobs:
   test:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # master, 20/09/2026
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: statusline-rs
           shared-key: ci
@@ -42,11 +66,12 @@ jobs:
     runs-on: windows-latest
     needs: test
     steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # master, 20/09/2026
         with:
+          toolchain: stable
           components: rustfmt
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: statusline-rs
           shared-key: ci
@@ -58,11 +83,12 @@ jobs:
     runs-on: windows-latest
     needs: test
     steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: dtolnay/rust-toolchain@02cb101ec7c40f2c49e1d9714d64511d8e1b74de # master, 20/09/2026
         with:
+          toolchain: stable
           components: clippy
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: statusline-rs
           shared-key: ci

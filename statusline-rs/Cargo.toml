@@ -4,6 +4,8 @@ version = "2.2.0"
 edition = "2021"
 publish = false
 description = "Ligne de statut Claude Code — portage natif de statusline.ps1"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/gnash1971/statusline"
 
 [[bin]]
 name = "statusline"

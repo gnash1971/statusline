@@ -11,8 +11,10 @@
 # push normal.
 #
 # La protection contre le force-push (qui exigerait `git merge-base`, donc un fork)
-# n'est volontairement PAS faite ici. Pour une vraie protection force-push, passer
-# par une ruleset GitHub cote serveur (necessite un plan compatible).
+# n'est volontairement PAS faite ici : elle est assuree cote serveur par les
+# rulesets du depot (20/09/2026) - main : ni force-push, ni suppression,
+# signature exigee ; tags v* : ni suppression, ni deplacement, signature exigee.
+# Ce hook n'est qu'un premier filet, local et sans dependance.
 #
 # Git fournit sur stdin une ligne par reference poussee, au format :
 #   <local_ref> <local_sha> <remote_ref> <remote_sha>

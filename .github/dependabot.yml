@@ -1,0 +1,38 @@
+# Mises à jour de versions par Dependabot (les alertes de sécurité et leurs
+# correctifs sont un réglage du dépôt, indépendant de ce fichier).
+#
+# Deux écosystèmes, une passe hebdomadaire, une seule pull request par
+# écosystème (mises à jour groupées) : chaque PR passe par la CI complète
+# (`ci.yml`, déclencheur pull_request) avant fusion.
+#
+# - github-actions : les actions de `ci.yml` sont épinglées par SHA ; Dependabot
+#   avance le SHA et le commentaire de version. `dtolnay/rust-toolchain` n'a
+#   ni tag ni release : il ne sera pas suivi, son épingle se met à jour à la main.
+# - cargo : le crate est sous `statusline-rs/`, `Cargo.lock` est suivi.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Europe/Paris
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "ci"
+
+  - package-ecosystem: cargo
+    directory: /statusline-rs
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Europe/Paris
+    groups:
+      cargo:
+        patterns: ["*"]
+    commit-message:
+      prefix: "deps"

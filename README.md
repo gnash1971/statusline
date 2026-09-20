@@ -53,8 +53,10 @@ lui-même les arcs Powerline (`U+E0B5`, `U+E0B7`) et les blocs du cadre, sans
 police particulière.
 
 Sans compiler : la dernière Release porte le binaire x64,
-[`statusline.exe`](https://github.com/gnash1971/statusline/releases/latest/download/statusline.exe).
-Avec Rust stable :
+[`statusline.exe`](https://github.com/gnash1971/statusline/releases/latest/download/statusline.exe),
+avec son empreinte `statusline.exe.sha256` — `(Get-FileHash statusline.exe).Hash`
+doit la retrouver. Les Releases sont immuables et leur tag est signé
+(`git verify-tag v2.2.0` après clonage). Avec Rust stable :
 
 ```bat
 cd statusline-rs
@@ -89,6 +91,8 @@ pouvant être écrasé mais bien renommé.
 | `analyser-journal.ps1` | Active, arrête et dépouille le journal de diagnostic du binaire |
 | `docs/statusline-rust.md` | Le dossier du portage et de chacune de ses évolutions, daté |
 | `guide.html`, `guide/` | Le guide utilisateur illustré ; `guide/generer-guide.ps1` régénère ses figures à partir du binaire, dans un bac isolé |
+| `SECURITY.md` | Comment signaler une vulnérabilité, ce que le binaire lit et n'envoie pas |
+| `LICENSE-MIT`, `LICENSE-APACHE` | Double licence, au choix du destinataire |
 
 ## Tests
 
@@ -107,7 +111,22 @@ colorés sont couverts par les tests du crate.
 
 La CI (`.github/workflows/ci.yml`) rejoue `cargo test`, `cargo build
 --release`, `cargo fmt --check` et `cargo clippy --all-targets -- -D warnings`
-sur Windows à chaque push sur `main` ; les quatre sont bloquants.
+sur Windows à chaque push sur `main` et sur chaque pull request ; les quatre
+sont bloquants. Le jeton du workflow est en lecture seule, chaque action est
+épinglée par le SHA de son commit — le dépôt l'exige — et Dependabot
+(`.github/dependabot.yml`) fait suivre épingles et dépendances Cargo, une
+pull request hebdomadaire par écosystème. CodeQL analyse les workflows et le
+crate à chaque push.
+
+## Sécurité
+
+Le binaire lit le payload que Claude Code lui passe, `~/.claude.json` (type
+d'abonnement, dernier relevé `/usage`) et son propre cache sous
+`%LOCALAPPDATA%\claude-code\` ; il n'ouvre aucune connexion et n'écrit que ce
+cache. Une vulnérabilité se signale par le formulaire privé du dépôt, pas par
+une issue : voir [`SECURITY.md`](SECURITY.md). La branche `main` et les
+tags `v*` sont protégés par des rulesets (ni force-push, ni suppression,
+signature exigée) ; les commits et les tags sont signés.
 
 ## État
 
@@ -116,4 +135,7 @@ décisions sont dans `docs/statusline-rust.md`.
 
 ## Licence
 
-À définir.
+Double licence, au choix du destinataire : [MIT](LICENSE-MIT) ou
+[Apache 2.0](LICENSE-APACHE), la convention de l'écosystème Rust
+(`license = "MIT OR Apache-2.0"` dans `Cargo.toml`). Toute contribution
+soumise au dépôt est réputée offerte sous les deux.

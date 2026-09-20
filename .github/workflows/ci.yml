@@ -8,6 +8,10 @@
 # sur toutes les cibles (tests compris). Clippy a été non bloquant le temps du
 # premier push, jusqu'à la correction des trois lints qu'il relevait — le
 # 20/09/2026, le jour même.
+#
+# actions/checkout en v5 : la v4 déclare Node 20, que les runners exécutent de
+# force sur Node 24 depuis septembre 2025 avec un avertissement à chaque job ;
+# la v5 déclare node24 sans autre changement. rust-cache@v2 le déclare déjà.
 name: ci
 
 on:
@@ -26,7 +30,7 @@ jobs:
   test:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
         with:
@@ -38,7 +42,7 @@ jobs:
     runs-on: windows-latest
     needs: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
@@ -54,7 +58,7 @@ jobs:
     runs-on: windows-latest
     needs: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy

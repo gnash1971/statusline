@@ -106,9 +106,8 @@ sous `NO_COLOR`, où elle est, octet pour octet, celle du script. Les cas
 colorés sont couverts par les tests du crate.
 
 La CI (`.github/workflows/ci.yml`) rejoue `cargo test`, `cargo build
---release` et `cargo fmt --check` sur Windows à chaque push sur `main` ;
-`clippy -D warnings` y tourne en non bloquant tant que trois lints connus ne
-sont pas corrigés.
+--release`, `cargo fmt --check` et `cargo clippy --all-targets -- -D warnings`
+sur Windows à chaque push sur `main` ; les quatre sont bloquants.
 
 ## État
 

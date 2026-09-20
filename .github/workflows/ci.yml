@@ -4,10 +4,10 @@
 # Windows sont facturés x2, et un filtre `branches: '**'` avait épuisé les
 # crédits Actions du mois. Ici : push sur main, déclenchement manuel.
 #
-# Trois jobs bloquants — tests, build + format, — et clippy en non bloquant :
-# au 20/09/2026 le crate porte trois lints connus sous `-D warnings`
-# (`doc_overindented_list_items` en production, deux `assertions_on_constants`
-# dans les tests). Passer `continue-on-error` à false une fois corrigés.
+# Trois jobs, tous bloquants : tests, build + format, clippy sous `-D warnings`
+# sur toutes les cibles (tests compris). Clippy a été non bloquant le temps du
+# premier push, jusqu'à la correction des trois lints qu'il relevait — le
+# 20/09/2026, le jour même.
 name: ci
 
 on:
@@ -53,7 +53,6 @@ jobs:
   clippy:
     runs-on: windows-latest
     needs: test
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable

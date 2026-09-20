@@ -162,9 +162,13 @@ mod tests {
         assert!(sept_jours.seuils_selon_modele);
         assert!(sept_jours.ancrage_selon_modele);
         // La fenêtre propre au modèle ne suit que par l'ancrage : son budget
-        // est déjà celui du modèle, et ses seuils restent ceux d'Opus.
-        assert!(!FENETRE_MODELE.seuils_selon_modele);
-        assert!(FENETRE_MODELE.ancrage_selon_modele);
+        // est déjà celui du modèle, et ses seuils restent ceux d'Opus. Lue par
+        // référence comme les deux autres : une assertion écrite directement
+        // sur la constante serait pliée à la compilation, et clippy la refuse
+        // (`assertions_on_constants`).
+        let fenetre_modele = &FENETRE_MODELE;
+        assert!(!fenetre_modele.seuils_selon_modele);
+        assert!(fenetre_modele.ancrage_selon_modele);
 
         let facteur = facteur_famille(Some("fable"));
 

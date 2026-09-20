@@ -8,7 +8,7 @@
 //! Les champs effectivement lus, relevés sur Claude Code 2.1.245 :
 //!   - `model.display_name`                    : nom lisible, ex. « Opus 5 »
 //!   - `model.id`                              : identifiant, ex. « claude-fable-5-1 » —
-//!                                               en donne la famille, voir [`modele`]
+//!     en donne la famille, voir [`modele`]
 //!   - `effort.level`                          : low|medium|high|xhigh|max
 //!   - `fast_mode`                             : mode rapide actif
 //!   - `thinking.enabled`                      : réflexion étendue active

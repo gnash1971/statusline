@@ -1,6 +1,6 @@
 [package]
 name = "statusline"
-version = "2.2.1"
+version = "2.3.0"
 edition = "2021"
 publish = false
 description = "Ligne de statut Claude Code — portage natif de statusline.ps1"
@@ -19,9 +19,10 @@ path = "src/main.rs"
 # reproduit octet pour octet (voir ecrire_cache).
 serde_json = { version = "1.0", default-features = false, features = ["std"] }
 
-# Deux besoins, tous deux absents de la bibliothèque standard : les
-# métadonnées de version d'un exécutable, et la conversion vers l'heure
-# locale du poste.
+# Des besoins absents de la bibliothèque standard : la conversion vers l'heure
+# locale du poste, et la largeur de la console. Les métadonnées de version
+# d'un exécutable n'en font plus partie depuis le retrait du segment de
+# version, le 23/09/2026.
 windows-sys = { version = "0.61", features = [
     "Win32_Foundation",
     "Win32_Storage_FileSystem",

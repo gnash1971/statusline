@@ -13,8 +13,8 @@ signalée dans les notes.
 ## Versions prises en charge
 
 La dernière Release, et elle seule. Le binaire ne se met pas à jour tout seul
-: la version en cours d'usage est affichée par la ligne elle-même (segment
-`v2.x.y`), en cyan si elle diffère de celle que la session a lancée.
+: pour savoir si le vôtre est le dernier, comparer son empreinte à celle de la
+dernière Release (voir plus bas).
 
 ## Ce que le binaire lit, écrit et n'envoie pas
 
@@ -25,7 +25,6 @@ statut. Il lit :
   contexte, coût, répertoire, version) ;
 - `~/.claude.json`, pour le type d'abonnement et le dernier relevé `/usage`
   (`CLAUDE_STATUSLINE_CONFIG` en désigne un autre) ;
-- les métadonnées de version de `claude.exe` (`CLAUDE_STATUSLINE_BINAIRE`) ;
 - le dossier `.git` le plus proche du répertoire courant, pour la branche ;
 - son cache `claude-code\statusline-cache.json` sous `%LOCALAPPDATA%` (repli
   `%TEMP%`), pour projeter le rythme de consommation.

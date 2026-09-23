@@ -13,6 +13,12 @@
     venait à manquer. Décision et raisons : .claude\CHANTIER-statusline-capsule.md
     (Q2) et statusline-rust.md §23.
 
+    Une exception au gel, le 23/09/2026 : deux retouches demandées par
+    l'utilisateur changent la sortie sous NO_COLOR, et y ont donc été portées
+    à l'identique pour que l'oracle reste comparable — le segment de version
+    est retiré, et un chemin trop profond se replie en « …\feuille » au lieu
+    de « racine\…\feuille ».
+
     Claude Code transmet sur l'entrée standard un objet JSON décrivant la
     session en cours, et affiche telle quelle la ligne écrite sur la sortie
     standard.
@@ -29,17 +35,13 @@
       - context_window.used_percentage        : contexte occupé, en pourcentage
       - rate_limits.<fenêtre>.used_percentage : consommation, en pourcentage
       - rate_limits.<fenêtre>.resets_at       : remise à zéro, en secondes Unix
-      - version                               : version chargée par la session
 
     Les fenêtres de limitation sont au nombre de deux, « five_hour » et
     « seven_day ». Chacune peut être absente indépendamment de l'autre, et
     aucune n'est renseignée avant la première réponse de l'API.
 
-    La version affichée en tête de ligne ne vient pas de ce payload mais du
-    binaire présent sur le disque : voir Get-SegmentVersion pour la raison.
-
-    L'abonnement non plus, et pour une raison plus radicale : le contrat n'en
-    porte rien du tout. Les trente-quatre champs relevés le 26/08/2026 sur la
+    L'abonnement ne vient pas de ce payload, et pour une raison radicale : le
+    contrat n'en porte rien du tout. Les trente-quatre champs relevés le 26/08/2026 sur la
     version 2.1.246 sont muets là-dessus, et la valeur se lit donc dans
     « ~/.claude.json » — voir Get-Abonnement. Le même fichier porte, depuis le
     03/09/2026, la fenêtre hebdomadaire propre au modèle que /usage relève —
@@ -56,7 +58,7 @@
     imminent à 5 % de consommation : voir $RatioMaxExtrapolation.
 
     Sortie type :
-    « Pro v2.1.245 · Opus 5 xhigh PY_xl (main) ctx 34% · 5h ▒ 29%
+    « Pro Opus 5 xhigh PY_xl (main) ctx 34% · 5h ▒ 29%
       → 61% 15:00 · 7j ▒ 41% », et sur la fenêtre qui va au plafond
     « 5h █ 80% épuisé 14:10 15:00 ».
 
@@ -95,7 +97,7 @@
       2. sortie            — écriture de la ligne et coloration ;
       3. conversions       — lecture défensive des valeurs du payload ;
       4. état sur disque   — cache de la fenêtre et journal de diagnostic ;
-      5. lectures disque   — branche Git, version du binaire, abonnement ;
+      5. lectures disque   — branche Git, abonnement ;
       6. segments          — un producteur par morceau de la ligne ;
       7. assemblage        — composition de la ligne complète ;
       8. programme principal.
@@ -174,7 +176,7 @@ $SeparateurInterne = " "
 # Séparateur de groupe, le rang le plus élevé des trois — réduit à l'espace
 # simple le 26/08/2026 au soir.
 #
-# La ligne compte trois familles : ce qui tourne (abonnement, version, modèle),
+# La ligne compte trois familles : ce qui tourne (abonnement, modèle),
 # où l'on est (emplacement), ce que la session consomme (contexte et fenêtres).
 # Ce rang a porté du 25/08/2026 au 26/08/2026 une barre « │ » — U+2502, présent
 # dans Consolas, contrairement aux séparateurs powerline qui exigeraient une
@@ -202,21 +204,10 @@ $SeparateurGroupe = " "
 # Libellé affiché quand le modèle est inconnu, et repli ultime sur erreur.
 $ModeleParDefaut = "Claude"
 
-# Préfixe du segment de version, en tête de ligne. Réduit au « v » seul : le nom
-# du produit ne varie jamais et occupait douze caractères à l'endroit le plus
-# exposé de la ligne, celui que l'œil heurte à chaque rafraîchissement.
-$PrefixeVersion = "v"
-
-# Emplacement du binaire, relatif au profil utilisateur : c'est là que
-# l'installation « native » le pose. La variable d'environnement
-# CLAUDE_STATUSLINE_BINAIRE désigne un autre chemin, absolu, sur un poste
-# installé ailleurs.
-$CheminBinaireRelatif = ".local\bin\claude.exe"
-
 # Configuration de Claude Code, relative au profil utilisateur : c'est là que se
 # lit l'abonnement du compte connecté, le payload n'en disant rien. La variable
-# CLAUDE_STATUSLINE_CONFIG désigne un autre chemin, sur le même modèle que
-# CLAUDE_STATUSLINE_BINAIRE. Voir Get-Abonnement.
+# CLAUDE_STATUSLINE_CONFIG désigne un autre chemin, absolu, sur un poste
+# installé ailleurs. Voir Get-Abonnement.
 $CheminConfigRelatif = ".claude.json"
 
 # Types d'organisation et libellés d'abonnement correspondants.
@@ -234,8 +225,8 @@ $CheminConfigRelatif = ".claude.json"
 # Le mot « Claude » est tombé le 26/08/2026, second lot de retouches. Il occupait
 # sept colonnes en tête de ligne pour ne rien distinguer : dans une ligne de
 # statut de Claude Code, aucun autre éditeur ne dispute le nom. C'est mot pour
-# mot l'argument qui avait réduit « Claude Code v » à $PrefixeVersion, appliqué
-# au segment voisin.
+# mot l'argument qui avait réduit « Claude Code v » au « v » seul, appliqué au
+# segment voisin — celui de version, retiré depuis, le 23/09/2026.
 #
 # ConvertTo-LibelleLisible élague le même préfixe sur les valeurs hors table,
 # faute de quoi un abonnement inventé après cette version s'afficherait
@@ -635,8 +626,10 @@ $BlocsJauge = @(
     "$JaugePlein$JaugePlein"
 )
 
-# Nombre de segments de chemin affichés avant repli en « racine\…\feuille ».
-$ProfondeurMaxChemin = 3
+# Nombre de segments de chemin affichés avant repli en « …\feuille » —
+# « racine\…\feuille » jusqu'au 23/09/2026. Deux, et non plus trois, depuis le
+# même jour : « PY_xl\.claude\user-config » est déjà un chemin long.
+$ProfondeurMaxChemin = 2
 
 # Remontée maximale à la recherche d'un « .git ». Un lien mal formé ne peut
 # ainsi pas faire tourner la boucle indéfiniment, et 32 niveaux dépassent
@@ -1191,11 +1184,12 @@ function Write-Diagnostic {
 }
 
 # ===========================================================================
-# 5. Lectures sur disque : dépôt Git, binaire installé, abonnement
+# 5. Lectures sur disque : dépôt Git, abonnement
 # ===========================================================================
 #
-# Trois informations manquent au contrat d'entrée et se lisent donc sur le
-# disque. Dans les trois cas la même contrainte gouverne : la ligne se
+# Deux informations manquent au contrat d'entrée et se lisent donc sur le
+# disque — trois jusqu'au retrait du segment de version, le 23/09/2026. Dans
+# les deux cas la même contrainte gouverne : la ligne se
 # rafraîchit souvent, et lancer un processus à chaque fois se paierait cher —
 # le workspace est sur un lecteur réseau. Tout passe par des lectures de
 # fichier.
@@ -1299,74 +1293,12 @@ function Get-BrancheGit {
     }
 }
 
-# Rend le chemin du binaire Claude Code, ou $null s'il reste introuvable.
-#
-# CLAUDE_STATUSLINE_BINAIRE l'emporte, et sans repli : une désignation
-# explicite qui ne résout pas doit se voir, pas se faire remplacer en silence
-# par l'emplacement habituel.
-#
-# Le PATH n'est volontairement pas balayé en dernier recours. Get-Command
-# coûterait ce balayage à chaque rafraîchissement, pour un gain nul tant que
-# l'installation est standard — et le segment se retire proprement sinon.
-function Find-Binaire {
-    if ($env:CLAUDE_STATUSLINE_BINAIRE) {
-        if (Test-Path -LiteralPath $env:CLAUDE_STATUSLINE_BINAIRE -PathType Leaf) {
-            return $env:CLAUDE_STATUSLINE_BINAIRE
-        }
-        return $null
-    }
-
-    if (-not $env:USERPROFILE) {
-        return $null
-    }
-
-    $natif = Join-Path $env:USERPROFILE $script:CheminBinaireRelatif
-    if (Test-Path -LiteralPath $natif -PathType Leaf) {
-        return $natif
-    }
-
-    return $null
-}
-
-# Lit la version du binaire installé, ou $null si elle n'est pas lisible.
-#
-# La version est prise dans les métadonnées du fichier, jamais en lançant
-# « claude --version » : le binaire pèse près de 300 Mo, et le démarrer à
-# chaque rafraîchissement de la ligne est hors de question.
-#
-# Windows y stocke quatre composantes (« 2.1.226.0 ») là où Claude Code en
-# annonce trois. La quatrième, toujours nulle, est retirée ; une écriture
-# inattendue est rendue telle quelle plutôt que perdue.
-function Get-VersionBinaire {
-    try {
-        $chemin = Find-Binaire
-        if (-not $chemin) {
-            return $null
-        }
-
-        $version = (Get-Item -LiteralPath $chemin).VersionInfo.ProductVersion
-        if ([string]::IsNullOrWhiteSpace($version)) {
-            return $null
-        }
-
-        $version = $version.Trim()
-        if ($version -match '^(\d+\.\d+\.\d+)\.0$') {
-            return $Matches[1]
-        }
-
-        return $version
-    }
-    catch {
-        return $null
-    }
-}
-
 # Rend le chemin de la configuration Claude Code, ou $null s'il est introuvable.
 #
-# CLAUDE_STATUSLINE_CONFIG l'emporte, et sans repli : c'est la convention de
-# CLAUDE_STATUSLINE_BINAIRE, et pour la même raison — une désignation explicite
-# qui ne résout pas doit se voir, pas se faire remplacer en silence par
-# l'emplacement habituel. Le harnais de non-régression s'en sert pour couvrir
+# CLAUDE_STATUSLINE_CONFIG l'emporte, et sans repli — convention reprise de
+# CLAUDE_STATUSLINE_BINAIRE, disparu avec le segment de version le 23/09/2026 :
+# une désignation explicite qui ne résout pas doit se voir, pas se faire
+# remplacer en silence par l'emplacement habituel. Le harnais de non-régression s'en sert pour couvrir
 # les replis sans rien supposer du compte réel du poste.
 function Find-Config {
     if ($env:CLAUDE_STATUSLINE_CONFIG) {
@@ -1829,8 +1761,10 @@ function Get-BlocJauge {
     return [string]$script:BlocsJauge[$index]
 }
 
-# Replie une suite de segments de chemin en « racine\…\feuille » au-delà de la
-# profondeur maximale, pour ne pas manger la ligne.
+# Replie une suite de segments de chemin en « …\feuille » au-delà de la
+# profondeur maximale, pour ne pas manger la ligne. La racine du projet restait
+# en tête jusqu'au 23/09/2026 ; seule la feuille demeure depuis, à la demande
+# de l'utilisateur.
 function Compress-Chemin {
     param([string[]]$Segments)
 
@@ -1838,7 +1772,7 @@ function Compress-Chemin {
         return $Segments
     }
 
-    return @($Segments[0], "…", $Segments[-1])
+    return @("…", $Segments[-1])
 }
 
 # Met en forme le répertoire de travail, relativement au répertoire de
@@ -2342,10 +2276,9 @@ function Get-SegmentEmplacement {
 
 # Produit le segment d'abonnement, tout en tête de ligne et en pastille.
 #
-# Il ouvre la ligne parce qu'il en est le cadre : la version dit quel Claude
-# Code, le modèle lequel de ses modèles, et l'abonnement sous quel régime les
-# deux tournent — c'est lui qui décide de la taille des fenêtres de limitation
-# affichées à l'autre bout.
+# Il ouvre la ligne parce qu'il en est le cadre : le modèle dit ce qui tourne,
+# et l'abonnement sous quel régime — c'est lui qui décide de la taille des
+# fenêtres de limitation affichées à l'autre bout.
 #
 # Il a été atténué comme la version, et pour la même raison : c'est l'information
 # la moins volatile de toute la ligne, celle qui se consulte et ne se surveille
@@ -2374,59 +2307,6 @@ function Get-SegmentAbonnement {
     }
 
     return (Add-PastilleAbonnement $abonnement)
-}
-
-# Produit le segment de version, en tête de ligne.
-#
-# La version affichée est celle du binaire posé sur le disque, et non celle que
-# la session a chargée en mémoire : une mise à jour automatique remplace le
-# binaire sans toucher au processus en cours, et l'écart entre les deux dure
-# jusqu'au prochain lancement. C'est précisément ce que ce segment sert à voir.
-#
-# Repli sur « version » du payload quand le binaire est introuvable : la
-# version de la session reste une réponse honnête à « quelle version de Claude
-# Code », et vaut mieux qu'un segment absent. Le repli exige une chaîne — un
-# payload dégénéré (tableau, nombre) ne doit pas se retrouver mis en forme.
-#
-# La teinte dit l'écart — 26/08/2026. Le segment coûtait onze colonnes
-# permanentes pour dire une chose qui n'arrive qu'à une mise à jour près. Il
-# porte donc la teinte des marqueurs quand les deux versions diffèrent, et son
-# gris de chrome le reste du temps : la ligne signale l'écart au lieu de le
-# laisser à qui pense à comparer deux nombres de quatre chiffres. C'est la règle
-# que tiennent déjà les marqueurs de mode — ne rien dire de l'ordinaire, se voir
-# sur l'écart.
-#
-# La comparaison exige les deux valeurs. Un binaire introuvable ou un payload
-# muet ne produit donc aucune teinte : il n'y a pas d'écart constaté, seulement
-# une inconnue, et le cyan annoncerait à tort une mise à jour en attente.
-function Get-SegmentVersion {
-    param($Donnees)
-
-    $duDisque = Get-VersionBinaire
-    $deLaSession = if ($Donnees.version -is [string]) { $Donnees.version } else { $null }
-
-    $version = if ($duDisque) { $duDisque } else { $deLaSession }
-
-    if ([string]::IsNullOrWhiteSpace($version)) {
-        return $null
-    }
-
-    # Le binaire du disque a été remplacé sous la session, qui tourne encore sur
-    # l'ancien : l'écart dure jusqu'au prochain lancement de Claude Code.
-    $decale = $duDisque -and $deLaSession -and ($duDisque.Trim() -cne $deLaSession.Trim())
-
-    $texte = $script:PrefixeVersion + $version
-
-    # Atténué le reste du temps, comme tout le chrome : c'est l'information la
-    # moins volatile de la ligne, celle qu'on consulte de loin en loin plutôt
-    # qu'on ne surveille. Elle a porté la pastille du 21/08/2026 au 22/08/2026,
-    # le temps de constater que le fond servait mieux l'emplacement — voir
-    # Get-SegmentEmplacement.
-    if ($decale) {
-        return (Add-Marqueur $texte)
-    }
-
-    return (Add-Attenuation $texte)
 }
 
 # Produit le segment de modèle : nom, effort de raisonnement, puis marqueurs de
@@ -2709,8 +2589,9 @@ function Get-Modele {
 # sa pastille. Il ouvrait jusque-là le groupe « ce qui tourne », d'où un « · »
 # entre lui et la version ; un fond n'a pas besoin de ce point pour qu'on voie où
 # il s'arrête, et la mécanique des groupes lui donne au passage le bon
-# comportement lorsqu'il manque — la ligne commence alors par la version, sans
-# espace orphelin.
+# comportement lorsqu'il manque — la ligne commence alors par le modèle, sans
+# espace orphelin. La version, qui précédait le modèle, est retirée depuis le
+# 23/09/2026.
 function Get-LigneStatut {
     param(
         $Donnees,
@@ -2726,10 +2607,7 @@ function Get-LigneStatut {
     # la boucle recevrait des chaînes au lieu de groupes.
     $groupes = @(
         , @( (Get-SegmentAbonnement -Config $config) )
-        , @(
-            (Get-SegmentVersion $Donnees)
-            (Get-SegmentModele -Donnees $Donnees -Modele $Modele)
-        )
+        , @( (Get-SegmentModele -Donnees $Donnees -Modele $Modele) )
         , @( (Get-SegmentEmplacement $Donnees) )
         , @(
             (Get-SegmentContexte $Donnees)

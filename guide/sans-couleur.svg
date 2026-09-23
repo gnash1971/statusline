@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns='http://www.w3.org/2000/svg' width='910' height='49' viewBox='0 0 910 49' role='img' aria-labelledby='titre'>
+<svg xmlns='http://www.w3.org/2000/svg' width='712' height='49' viewBox='0 0 712 49' role='img' aria-labelledby='titre'>
 <title id='titre'>statusline — sans-couleur</title>
-<desc>Max 5x v2.1.278 · Opus 5 high atelier\rust\src (main) ctx 34% · 5h ▒░ 20% → 44% 13:22 · 7j █░ 45%</desc>
+<desc>Max 5x Opus 5 high …\src (main) ctx 34% · 5h ▒░ 20% → 44% 18:03 · 7j █░ 45%</desc>
 <style>text{font-family:'Cascadia Mono','Consolas','DejaVu Sans Mono',monospace;font-size:15px;dominant-baseline:central;white-space:pre}.l{font-family:'Segoe UI',system-ui,sans-serif;font-size:12px;fill:#8b949e;dominant-baseline:auto}</style>
-<rect x='0.5' y='0.5' width='909' height='48' rx='8' fill='#0f1114' stroke='#2a2f36'/>
-<rect x='617' y='14' width='3' height='3' fill='#cccccc'/><rect x='623' y='14' width='3' height='3' fill='#cccccc'/><rect x='620' y='17' width='3' height='3' fill='#cccccc'/><rect x='617' y='20' width='3' height='3' fill='#cccccc'/><rect x='623' y='20' width='3' height='3' fill='#cccccc'/><rect x='620' y='23' width='3' height='3' fill='#cccccc'/><rect x='617' y='26' width='3' height='3' fill='#cccccc'/><rect x='623' y='26' width='3' height='3' fill='#cccccc'/><rect x='620' y='29' width='3' height='3' fill='#cccccc'/><rect x='617' y='32' width='3' height='3' fill='#cccccc'/><rect x='623' y='32' width='3' height='3' fill='#cccccc'/>
-<rect x='626' y='14' width='3' height='3' fill='#cccccc'/><rect x='632' y='20' width='3' height='3' fill='#cccccc'/><rect x='629' y='23' width='3' height='3' fill='#cccccc'/><rect x='626' y='26' width='3' height='3' fill='#cccccc'/><rect x='632' y='32' width='3' height='3' fill='#cccccc'/>
-<rect x='833' y='14' width='9' height='21' fill='#cccccc'/>
-<rect x='842' y='14' width='3' height='3' fill='#cccccc'/><rect x='848' y='20' width='3' height='3' fill='#cccccc'/><rect x='845' y='23' width='3' height='3' fill='#cccccc'/><rect x='842' y='26' width='3' height='3' fill='#cccccc'/><rect x='848' y='32' width='3' height='3' fill='#cccccc'/>
-<text x='14' y='24.5' textLength='603' lengthAdjust='spacingAndGlyphs' fill='#cccccc' xml:space='preserve'>Max 5x v2.1.278 · Opus 5 high atelier\rust\src (main) ctx 34% · 5h </text>
-<text x='635' y='24.5' textLength='198' lengthAdjust='spacingAndGlyphs' fill='#cccccc' xml:space='preserve'> 20% → 44% 13:22 · 7j </text>
-<text x='851' y='24.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='#cccccc' xml:space='preserve'> 45%</text>
+<rect x='0.5' y='0.5' width='711' height='48' rx='8' fill='#0f1114' stroke='#2a2f36'/>
+<rect x='419' y='14' width='3' height='3' fill='#cccccc'/><rect x='425' y='14' width='3' height='3' fill='#cccccc'/><rect x='422' y='17' width='3' height='3' fill='#cccccc'/><rect x='419' y='20' width='3' height='3' fill='#cccccc'/><rect x='425' y='20' width='3' height='3' fill='#cccccc'/><rect x='422' y='23' width='3' height='3' fill='#cccccc'/><rect x='419' y='26' width='3' height='3' fill='#cccccc'/><rect x='425' y='26' width='3' height='3' fill='#cccccc'/><rect x='422' y='29' width='3' height='3' fill='#cccccc'/><rect x='419' y='32' width='3' height='3' fill='#cccccc'/><rect x='425' y='32' width='3' height='3' fill='#cccccc'/>
+<rect x='428' y='14' width='3' height='3' fill='#cccccc'/><rect x='434' y='20' width='3' height='3' fill='#cccccc'/><rect x='431' y='23' width='3' height='3' fill='#cccccc'/><rect x='428' y='26' width='3' height='3' fill='#cccccc'/><rect x='434' y='32' width='3' height='3' fill='#cccccc'/>
+<rect x='635' y='14' width='9' height='21' fill='#cccccc'/>
+<rect x='644' y='14' width='3' height='3' fill='#cccccc'/><rect x='650' y='20' width='3' height='3' fill='#cccccc'/><rect x='647' y='23' width='3' height='3' fill='#cccccc'/><rect x='644' y='26' width='3' height='3' fill='#cccccc'/><rect x='650' y='32' width='3' height='3' fill='#cccccc'/>
+<text x='14' y='24.5' textLength='405' lengthAdjust='spacingAndGlyphs' fill='#cccccc' xml:space='preserve'>Max 5x Opus 5 high …\src (main) ctx 34% · 5h </text>
+<text x='437' y='24.5' textLength='198' lengthAdjust='spacingAndGlyphs' fill='#cccccc' xml:space='preserve'> 20% → 44% 18:03 · 7j </text>
+<text x='653' y='24.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='#cccccc' xml:space='preserve'> 45%</text>
 </svg>

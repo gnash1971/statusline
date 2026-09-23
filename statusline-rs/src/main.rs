@@ -18,7 +18,9 @@
 //!   - `context_window.context_window_size`    : fenêtre effective, en jetons
 //!   - `rate_limits.<fenêtre>.used_percentage` : consommation, en pourcentage
 //!   - `rate_limits.<fenêtre>.resets_at`       : remise à zéro, en secondes Unix
-//!   - `version`                               : version chargée par la session
+//!
+//! `version` était lu jusqu'au 23/09/2026, date du retrait du segment de
+//! version à la demande de l'utilisateur.
 //!
 //! Le payload en porte deux fois plus, dont `cost.total_lines_added`,
 //! `exceeds_200k_tokens`, `agent.name`, `pr`, `workspace.added_dirs` et
@@ -92,10 +94,9 @@
 //! | [`disque`]      | 4     | racine des fichiers d'état, lecture d'un texte |
 //! | [`cache`]       | 4     | cache des fenêtres, sérialisé octet pour octet |
 //! | [`depot`]       | 5     | branche Git, lue dans « .git/HEAD » |
-//! | [`binaire`]     | 5     | version du binaire installé, lue dans ses métadonnées |
 //! | [`abonnement`]  | 5     | abonnement du compte, lu dans « ~/.claude.json » |
 //! | [`usage`]       | 5     | fenêtre propre au modèle, relevée par `/usage` dans « ~/.claude.json », et sa dérive entre deux relevés |
-//! | [`segments`]    | 6     | abonnement, version, modèle, emplacement, contexte |
+//! | [`segments`]    | 6     | abonnement, modèle, emplacement, contexte |
 //! | [`modele`]      | 6     | famille du modèle, facteur de consommation, seuils adaptés |
 //! | [`fenetres`]    | 6     | fenêtres de limitation, rythme et projection |
 //! | ce fichier      | 7 + 8 | assemblage de la ligne et programme principal |
@@ -120,7 +121,6 @@
 //! minimal, c'est un effacement — Claude Code ne garde pas le texte précédent.
 
 mod abonnement;
-mod binaire;
 mod cache;
 mod capture;
 mod conversions;
@@ -147,9 +147,7 @@ use crate::fenetres::segment_fenetres;
 use crate::journal::{journaliser, noter_panique};
 use crate::largeur::largeur_console;
 use crate::reglages::{MARGE_LARGEUR, MODELE_PAR_DEFAUT, RVB_CORPS, RVB_LIEU, RVB_TETE};
-use crate::segments::{
-    segment_abonnement, segment_contexte, segment_emplacement, segment_modele, segment_version,
-};
+use crate::segments::{segment_abonnement, segment_contexte, segment_emplacement, segment_modele};
 use crate::sortie::{
     assembler_capsules, confirmer_ligne, ecrire_ligne, teinte_du_palier, Compartiment, Palier,
 };
@@ -232,13 +230,7 @@ fn assembler_ligne(donnees: &Value, modele: &str) -> String {
 
     let capsule = vec![
         Compartiment::nouveau(RVB_TETE, vec![segment_abonnement(config.as_ref())]),
-        Compartiment::nouveau(
-            RVB_CORPS,
-            vec![
-                segment_version(donnees),
-                Some(segment_modele(donnees, modele)),
-            ],
-        ),
+        Compartiment::nouveau(RVB_CORPS, vec![Some(segment_modele(donnees, modele))]),
         Compartiment::nouveau(RVB_LIEU, vec![segment_emplacement(donnees)]),
         Compartiment::nouveau(teinte_du_palier(pire), mesures),
     ];

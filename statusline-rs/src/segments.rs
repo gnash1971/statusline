@@ -1,37 +1,41 @@
-//! Segments de la ligne : abonnement, version, modèle, emplacement, contexte.
+//! Segments de la ligne : abonnement, modèle, emplacement, contexte.
 //!
 //! Reste de la section 6, une fois les fenêtres de limitation parties dans
-//! [`crate::fenetres`]. Ces cinq-là ont en commun de ne faire que mettre en
+//! [`crate::fenetres`]. Ces quatre-là ont en commun de ne faire que mettre en
 //! forme ce qu'ils trouvent — aucun ne mesure, aucun n'écrit sur le disque — et
 //! de savoir se retirer quand la donnée manque : c'est ce qui garde la ligne
 //! honnête plutôt que remplie.
+//!
+//! Le segment de version, qui ouvrait le compartiment de ce qui tourne, a été
+//! retiré le 23/09/2026 à la demande de l'utilisateur, avec la lecture des
+//! métadonnées du binaire qui le servait.
 
 use serde_json::Value;
 
 use crate::abonnement::abonnement;
-use crate::binaire::version_binaire;
 use crate::conversions::{
     arrondir, champ, convertir_nombre, convertir_pourcent, en_texte, est_vrai,
 };
 use crate::depot::branche_git;
 use crate::reglages::{
     CODE_TEXTE_LIEU, CODE_TEXTE_LIEU_SOURD, CODE_TEXTE_TETE, FENETRE_CONTEXTE_ORDINAIRE,
-    LIBELLE_MODE_RAPIDE, LIBELLE_SANS_REFLEXION, PREFIXE_VERSION, PROFONDEUR_MAX_CHEMIN,
-    SEUIL_CONTEXTE, SEUIL_CRITIQUE_CONTEXTE, UNITE_POURCENT,
+    LIBELLE_MODE_RAPIDE, LIBELLE_SANS_REFLEXION, PROFONDEUR_MAX_CHEMIN, SEUIL_CONTEXTE,
+    SEUIL_CRITIQUE_CONTEXTE, UNITE_POURCENT,
 };
 use crate::sortie::{attenuer, colorer, formater_mesure, marquer, texte_plein, Palier};
 
-/// Replie une suite de segments de chemin en « racine\…\feuille » au-delà de la
+/// Replie une suite de segments de chemin en « …\feuille » au-delà de la
 /// profondeur maximale, pour ne pas manger la ligne.
+///
+/// La racine du projet ne reste plus en tête depuis le 23/09/2026, à la
+/// demande de l'utilisateur : au-delà de la profondeur maximale, seule la
+/// feuille distingue le sous-dossier, et la racine se lit déjà dans les
+/// chemins courts.
 fn compresser_chemin(segments: &[String]) -> Vec<String> {
     if segments.len() <= PROFONDEUR_MAX_CHEMIN {
         return segments.to_vec();
     }
-    vec![
-        segments[0].clone(),
-        "…".to_string(),
-        segments[segments.len() - 1].clone(),
-    ]
+    vec!["…".to_string(), segments[segments.len() - 1].clone()]
 }
 
 /// Dernier segment d'un chemin, comme `Split-Path -Leaf`.
@@ -194,10 +198,9 @@ pub(crate) fn segment_emplacement(donnees: &Value) -> Option<String> {
 /// Produit le segment d'abonnement, tout en tête de ligne : le texte du
 /// compartiment de **tête** de la capsule, en brun sur la teinte de marque.
 ///
-/// Il ouvre la ligne parce qu'il en est le cadre : la version dit quel Claude
-/// Code, le modèle lequel de ses modèles, et l'abonnement sous quel régime les
-/// deux tournent — c'est lui qui décide de la taille des fenêtres de limitation
-/// affichées à l'autre bout.
+/// Il ouvre la ligne parce qu'il en est le cadre : le modèle dit ce qui tourne,
+/// et l'abonnement sous quel régime — c'est lui qui décide de la taille des
+/// fenêtres de limitation affichées à l'autre bout.
 ///
 /// # De l'atténuation à la pastille, puis à la tête de capsule
 ///
@@ -235,76 +238,6 @@ pub(crate) fn segment_abonnement(config: Option<&Value>) -> Option<String> {
     }
 
     Some(colorer(&abonnement, CODE_TEXTE_TETE))
-}
-
-/// Indique si le binaire posé sur le disque a été remplacé sous la session, qui
-/// tourne alors encore sur l'ancien.
-///
-/// Extraite de [`segment_version`] pour rester vérifiable : la fonction
-/// complète lit le disque du poste, quand la décision, elle, ne dépend que de
-/// deux chaînes. C'est le mouvement de `colorer_selon` et `pastiller_selon`.
-///
-/// L'écart demande **deux** valeurs connues. Une seule, ou aucune, n'est pas un
-/// écart mais une inconnue : teinter là-dessus annoncerait une mise à jour dont
-/// rien ne dit qu'elle existe.
-fn version_decalee(du_disque: Option<&str>, de_la_session: Option<&str>) -> bool {
-    match (du_disque, de_la_session) {
-        (Some(disque), Some(session)) => disque.trim() != session.trim(),
-        _ => false,
-    }
-}
-
-/// Produit le segment de version, en tête de ligne.
-///
-/// La version affichée est celle du binaire posé sur le disque, et non celle
-/// que la session a chargée en mémoire : une mise à jour automatique remplace
-/// le binaire sans toucher au processus en cours, et l'écart entre les deux
-/// dure jusqu'au prochain lancement. C'est précisément ce que ce segment sert à
-/// voir.
-///
-/// Repli sur « version » du payload quand le binaire est introuvable : la
-/// version de la session reste une réponse honnête à « quelle version de Claude
-/// Code ». Le repli exige une chaîne — un payload dégénéré ne doit pas se
-/// retrouver mis en forme.
-///
-/// # La teinte dit l'écart — 26/08/2026
-///
-/// Le segment coûtait onze colonnes permanentes pour dire une chose qui n'arrive
-/// qu'à une mise à jour près. Il porte donc désormais la teinte des marqueurs,
-/// [`marquer`], **quand les deux versions diffèrent**, et son gris de chrome le
-/// reste du temps : la ligne signale l'écart au lieu de le laisser à qui pense à
-/// comparer deux nombres de quatre chiffres. C'est la règle que tiennent déjà
-/// les marqueurs de mode — ne rien dire de l'ordinaire, se voir sur l'écart.
-///
-/// La comparaison exige les **deux** valeurs. Un binaire introuvable ou un
-/// payload muet ne produit donc aucune teinte : il n'y a pas d'écart constaté,
-/// seulement une inconnue, et le cyan annoncerait à tort une mise à jour en
-/// attente.
-pub(crate) fn segment_version(donnees: &Value) -> Option<String> {
-    let du_disque = version_binaire();
-    let de_la_session = match champ(donnees, "version") {
-        Value::String(s) => Some(s.clone()),
-        _ => None,
-    };
-
-    let version = du_disque
-        .clone()
-        .or_else(|| de_la_session.clone())
-        .filter(|v| !v.trim().is_empty())?;
-
-    let decale = version_decalee(du_disque.as_deref(), de_la_session.as_deref());
-    let texte = format!("{}{}", PREFIXE_VERSION, version);
-
-    // Atténué le reste du temps, comme tout le chrome : c'est l'information la
-    // moins volatile de la ligne, celle qu'on consulte de loin en loin plutôt
-    // qu'on ne surveille. Elle a porté la pastille du 21/08/2026 au 22/08/2026,
-    // le temps de constater que le fond servait mieux l'emplacement — voir
-    // [`segment_emplacement`].
-    Some(if decale {
-        marquer(&texte)
-    } else {
-        attenuer(&texte)
-    })
 }
 
 /// Met en forme un nombre de jetons en « 1M » ou « 500k ».
@@ -473,25 +406,26 @@ mod tests {
         // feuille en clair.
         let dans_projet = json!({
             "workspace": {
-                "current_dir": "C:\\aucun-dossier-de-ce-nom-4c1f\\PY_xl\\PyScripts\\_dsn_",
+                "current_dir": "C:\\aucun-dossier-de-ce-nom-4c1f\\PY_xl\\PyScripts",
                 "project_dir": "C:\\aucun-dossier-de-ce-nom-4c1f\\PY_xl"
             }
         });
         assert_eq!(
             segment_emplacement(&dans_projet),
-            Some(format!("{}{}", sourd("PY_xl\\PyScripts\\"), clair("_dsn_")))
+            Some(format!("{}{}", sourd("PY_xl\\"), clair("PyScripts")))
         );
 
-        // Replié : le « … » reste parmi les ancêtres.
+        // Replié dès trois segments : le « … » tient lieu de tous les
+        // ancêtres, racine comprise, et reste en sourd.
         let replie = json!({
             "workspace": {
-                "current_dir": "C:\\aucun-dossier-de-ce-nom-4c1f\\PY_xl\\a\\b\\c",
+                "current_dir": "C:\\aucun-dossier-de-ce-nom-4c1f\\PY_xl\\b\\c",
                 "project_dir": "C:\\aucun-dossier-de-ce-nom-4c1f\\PY_xl"
             }
         });
         assert_eq!(
             segment_emplacement(&replie),
-            Some(format!("{}{}", sourd("PY_xl\\…\\"), clair("c")))
+            Some(format!("{}{}", sourd("…\\"), clair("c")))
         );
 
         // Branche portée par le payload d'une session --worktree : en clair,
@@ -599,21 +533,6 @@ mod tests {
     }
 
     #[test]
-    fn la_version_ne_se_teinte_que_sur_un_ecart_constate() {
-        // Le binaire du disque a été remplacé sous la session : c'est le seul
-        // cas où le segment sort de son gris.
-        assert!(version_decalee(Some("2.1.247"), Some("2.1.246")));
-        // Les deux concordent : rien à signaler.
-        assert!(!version_decalee(Some("2.1.246"), Some("2.1.246")));
-        // Les blancs encadrants ne font pas un écart.
-        assert!(!version_decalee(Some(" 2.1.246 "), Some("2.1.246")));
-        // Une seule valeur, ou aucune : une inconnue n'est pas un écart.
-        assert!(!version_decalee(Some("2.1.246"), None));
-        assert!(!version_decalee(None, Some("2.1.246")));
-        assert!(!version_decalee(None, None));
-    }
-
-    #[test]
     fn repertoire_relatif_au_projet() {
         let projet = Some("C:\\projet");
         assert_eq!(
@@ -624,10 +543,15 @@ mod tests {
             formater_repertoire(Some("C:\\projet\\src"), projet).as_deref(),
             Some("projet\\src")
         );
-        // Au-delà de trois segments, le milieu se replie.
+        // Dès trois segments, tout ce qui précède la feuille se replie,
+        // racine comprise — le cas de « PY_xl\.claude\user-config ».
+        assert_eq!(
+            formater_repertoire(Some("C:\\projet\\src\\api"), projet).as_deref(),
+            Some("…\\api")
+        );
         assert_eq!(
             formater_repertoire(Some("C:\\projet\\src\\api\\v2"), projet).as_deref(),
-            Some("projet\\…\\v2")
+            Some("…\\v2")
         );
         // Hors du projet, la feuille seule.
         assert_eq!(

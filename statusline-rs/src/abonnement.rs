@@ -9,9 +9,10 @@
 //! et aucun ne dit sur quel abonnement la session tourne.
 //!
 //! L'information vit donc là où Claude Code l'écrit lui-même : `~/.claude.json`,
-//! sous `oauthAccount.organizationType`. C'est le même mouvement que la version
-//! du binaire ([`crate::binaire`]) et la branche Git ([`crate::depot`]) — ce que
-//! le payload ne dit pas se lit sur le disque, jamais en lançant un processus.
+//! sous `oauthAccount.organizationType`. C'est le même mouvement que la branche
+//! Git ([`crate::depot`]), et que la version du binaire jusqu'au retrait de son
+//! segment le 23/09/2026 — ce que le payload ne dit pas se lit sur le disque,
+//! jamais en lançant un processus.
 //!
 //! # Le fichier lu, et celui qui ne l'est pas
 //!
@@ -75,10 +76,10 @@ use crate::reglages::{ABONNEMENTS, CHEMIN_CONFIG_RELATIF, PALIERS_MAX};
 /// Rend le chemin de la configuration Claude Code, ou `None` s'il est
 /// introuvable.
 ///
-/// `CLAUDE_STATUSLINE_CONFIG` l'emporte, et **sans repli** : c'est la convention
-/// de [`CLAUDE_STATUSLINE_BINAIRE`](crate::binaire), et pour la même raison — une
-/// désignation explicite qui ne résout pas doit se voir, pas se faire remplacer
-/// en silence par l'emplacement habituel. Le harnais de non-régression s'en sert
+/// `CLAUDE_STATUSLINE_CONFIG` l'emporte, et **sans repli** — convention reprise
+/// de `CLAUDE_STATUSLINE_BINAIRE`, disparu avec le segment de version le
+/// 23/09/2026 : une désignation explicite qui ne résout pas doit se voir, pas
+/// se faire remplacer en silence par l'emplacement habituel. Le harnais de non-régression s'en sert
 /// pour couvrir les replis sans rien supposer du compte réel du poste.
 fn trouver_config() -> Option<PathBuf> {
     if let Ok(explicite) = std::env::var("CLAUDE_STATUSLINE_CONFIG") {

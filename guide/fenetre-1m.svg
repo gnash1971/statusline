@@ -1,59 +1,55 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns='http://www.w3.org/2000/svg' width='577' height='202' viewBox='0 0 577 202' role='img' aria-labelledby='titre'>
+<svg xmlns='http://www.w3.org/2000/svg' width='478' height='202' viewBox='0 0 478 202' role='img' aria-labelledby='titre'>
 <title id='titre'>statusline — fenetre-1m</title>
-<desc> ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
- Max 5x  v2.1.278 · Opus 5  atelier (main)  ctx 61% 
- ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
- ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
- Max 5x  v2.1.278 · Opus 5 1M  atelier (main)  ctx 12% 
- ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔</desc>
+<desc> ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+ Max 5x  Opus 5  atelier (main)  ctx 61% 
+ ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+ ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+ Max 5x  Opus 5 1M  atelier (main)  ctx 12% 
+ ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔</desc>
 <style>text{font-family:'Cascadia Mono','Consolas','DejaVu Sans Mono',monospace;font-size:15px;dominant-baseline:central;white-space:pre}.l{font-family:'Segoe UI',system-ui,sans-serif;font-size:12px;fill:#8b949e;dominant-baseline:auto}</style>
-<rect x='0.5' y='0.5' width='576' height='201' rx='8' fill='#0f1114' stroke='#2a2f36'/>
+<rect x='0.5' y='0.5' width='477' height='201' rx='8' fill='#0f1114' stroke='#2a2f36'/>
 <text class='l' x='14' y='26'>context_window_size = 200 000</text>
-<rect x='23' y='50.38' width='495' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='23' y='50.38' width='396' height='2.63' fill='rgb(124,132,142)'/>
 <rect x='23' y='53' width='72' height='21' fill='rgb(215,119,87)'/>
-<rect x='95' y='53' width='180' height='21' fill='rgb(59,65,75)'/>
-<rect x='275' y='53' width='153' height='21' fill='rgb(39,74,49)'/>
-<rect x='428' y='53' width='90' height='21' fill='rgb(59,65,75)'/>
+<rect x='95' y='53' width='81' height='21' fill='rgb(59,65,75)'/>
+<rect x='176' y='53' width='153' height='21' fill='rgb(39,74,49)'/>
+<rect x='329' y='53' width='90' height='21' fill='rgb(59,65,75)'/>
 <path d='M 22.5,53.6 A 8.2,9.9 0 0 0 22.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 95.5,53.6 A 8.2,9.9 0 0 1 95.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
-<path d='M 275.5,53.6 A 8.2,9.9 0 0 1 275.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
-<path d='M 428.5,53.6 A 8.2,9.9 0 0 1 428.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
-<path d='M 518.5,53.6 A 8.2,9.9 0 0 1 518.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 176.5,53.6 A 8.2,9.9 0 0 1 176.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 329.5,53.6 A 8.2,9.9 0 0 1 329.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 419.5,53.6 A 8.2,9.9 0 0 1 419.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <text x='32' y='63.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(42,13,2)' xml:space='preserve'>Max 5x </text>
-<text x='113' y='63.5' textLength='72' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>v2.1.278</text>
-<text x='185' y='63.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(124,132,142)' xml:space='preserve'> · </text>
-<text x='212' y='63.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Opus 5 </text>
-<text x='293' y='63.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>atelier</text>
-<text x='356' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'> (</text>
-<text x='374' y='63.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>main</text>
-<text x='410' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'>) </text>
-<text x='446' y='63.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>ctx </text>
-<text x='482' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>61</text>
-<text x='500' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% </text>
-<rect x='23' y='74' width='495' height='2.63' fill='rgb(124,132,142)'/>
+<text x='113' y='63.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Opus 5 </text>
+<text x='194' y='63.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>atelier</text>
+<text x='257' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'> (</text>
+<text x='275' y='63.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>main</text>
+<text x='311' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'>) </text>
+<text x='347' y='63.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>ctx </text>
+<text x='383' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>61</text>
+<text x='401' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% </text>
+<rect x='23' y='74' width='396' height='2.63' fill='rgb(124,132,142)'/>
 <text class='l' x='14' y='119'>context_window_size = 1 000 000 : la session tourne en contexte étendu</text>
-<rect x='23' y='143.38' width='522' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='23' y='143.38' width='423' height='2.63' fill='rgb(124,132,142)'/>
 <rect x='23' y='146' width='72' height='21' fill='rgb(215,119,87)'/>
-<rect x='95' y='146' width='207' height='21' fill='rgb(59,65,75)'/>
-<rect x='302' y='146' width='153' height='21' fill='rgb(39,74,49)'/>
-<rect x='455' y='146' width='90' height='21' fill='rgb(59,65,75)'/>
+<rect x='95' y='146' width='108' height='21' fill='rgb(59,65,75)'/>
+<rect x='203' y='146' width='153' height='21' fill='rgb(39,74,49)'/>
+<rect x='356' y='146' width='90' height='21' fill='rgb(59,65,75)'/>
 <path d='M 22.5,146.6 A 8.2,9.9 0 0 0 22.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 95.5,146.6 A 8.2,9.9 0 0 1 95.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
-<path d='M 302.5,146.6 A 8.2,9.9 0 0 1 302.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
-<path d='M 455.5,146.6 A 8.2,9.9 0 0 1 455.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
-<path d='M 545.5,146.6 A 8.2,9.9 0 0 1 545.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 203.5,146.6 A 8.2,9.9 0 0 1 203.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 356.5,146.6 A 8.2,9.9 0 0 1 356.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<path d='M 446.5,146.6 A 8.2,9.9 0 0 1 446.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <text x='32' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(42,13,2)' xml:space='preserve'>Max 5x </text>
-<text x='113' y='156.5' textLength='72' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>v2.1.278</text>
-<text x='185' y='156.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(124,132,142)' xml:space='preserve'> · </text>
-<text x='212' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Opus 5 </text>
-<text x='275' y='156.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(147,197,208)' xml:space='preserve'>1M </text>
-<text x='320' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>atelier</text>
-<text x='383' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'> (</text>
-<text x='401' y='156.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>main</text>
-<text x='437' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'>) </text>
-<text x='473' y='156.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>ctx </text>
-<text x='509' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>12</text>
-<text x='527' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% </text>
-<rect x='23' y='167' width='522' height='2.63' fill='rgb(124,132,142)'/>
+<text x='113' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Opus 5 </text>
+<text x='176' y='156.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(147,197,208)' xml:space='preserve'>1M </text>
+<text x='221' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>atelier</text>
+<text x='284' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'> (</text>
+<text x='302' y='156.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>main</text>
+<text x='338' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'>) </text>
+<text x='374' y='156.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>ctx </text>
+<text x='410' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>12</text>
+<text x='428' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% </text>
+<rect x='23' y='167' width='423' height='2.63' fill='rgb(124,132,142)'/>
 </svg>

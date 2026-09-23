@@ -26,15 +26,17 @@
     positionné par cas, ce qui permet de couvrir la coloration alors que
     Claude Code définit cette variable pour les processus qu'il lance.
 
-    Deux exceptions à cette isolation, de même nature : le segment de version
-    lit le binaire réellement installé sur le poste, et le segment d'abonnement
-    la configuration réelle du compte. Les cas ordinaires affichent donc la
-    version du jour et l'abonnement du poste. Ce n'est pas gênant en mode
-    comparaison — les deux scripts lisent les mêmes fichiers — mais la sortie du
-    mode affichage suit les mises à jour de Claude Code et un changement
-    d'abonnement. Les cas dont le nom commence par « binaire » ou « abonnement »
-    détournent CLAUDE_STATUSLINE_BINAIRE et CLAUDE_STATUSLINE_CONFIG pour
-    couvrir, eux, les chemins de repli sans rien supposer du poste.
+    Une exception à cette isolation : le segment d'abonnement lit la
+    configuration réelle du compte. Les cas ordinaires affichent donc
+    l'abonnement du poste. Ce n'est pas gênant en mode comparaison — les deux
+    scripts lisent le même fichier — mais la sortie du mode affichage suit un
+    changement d'abonnement. Les cas dont le nom commence par « abonnement »
+    détournent CLAUDE_STATUSLINE_CONFIG pour couvrir, eux, les chemins de repli
+    sans rien supposer du poste.
+
+    Le segment de version, qui lisait de même le binaire installé, a été retiré
+    le 23/09/2026 ; ses quatre cas « binaire … » et le détournement de
+    CLAUDE_STATUSLINE_BINAIRE sont partis avec lui.
 
     Sortie 1 en cas de divergence, pour un usage en contrôle automatique.
 
@@ -120,11 +122,6 @@ function Initialize-Bac {
     # Dossier accentué : le workspace est francophone de bout en bout.
     New-Item -ItemType Directory -Path (Join-Path $Racine "données\été") -Force |
         Out-Null
-
-    # Faux binaire : un fichier quelconque, donc sans métadonnées de version.
-    # Couvre le cas d'une installation dont l'exécutable n'en porte pas.
-    Set-Content -LiteralPath (Join-Path $Racine "sans-version.exe") `
-        -Value "ceci n'est pas un exécutable" -Encoding UTF8
 
     # Configurations factices pour le segment d'abonnement. Aucune ne porte de
     # jeton : le champ lu vit dans « ~/.claude.json », jamais dans le fichier
@@ -240,18 +237,16 @@ function New-Payload {
 }
 
 # Décrit un cas : nom, payload, cache initial, coloration attendue, et
-# éventuels détournements du binaire dont la version est lue et de la
-# configuration où se lit l'abonnement.
+# éventuel détournement de la configuration où se lit l'abonnement.
 #
-# -Binaire et -Config vides laissent le script chercher l'installation et le
-# compte réels du poste, ce qui est le cas de la grande majorité des cas.
+# -Config vide laisse le script chercher le compte réel du poste, ce qui est
+# le cas de la grande majorité des cas.
 function New-Cas {
     param(
         [string]$Nom,
         [string]$Payload,
         [string]$Cache,
         [switch]$AvecCouleur,
-        [string]$Binaire,
         [string]$Config
     )
 
@@ -260,7 +255,6 @@ function New-Cas {
         Payload = $Payload
         Cache   = $Cache
         Couleur = [bool]$AvecCouleur
-        Binaire = $Binaire
         Config  = $Config
     }
 }
@@ -1068,32 +1062,9 @@ function Get-Cas {
         }
     })
 
-    # Chemins de repli du segment de version. Le binaire est détourné vers un
-    # fichier absent ou dépourvu de métadonnées, ce que le poste réel ne permet
-    # pas de reproduire.
-    $absent = Join-Path $Racine "aucun-binaire.exe"
-    $sansVersion = Join-Path $Racine "sans-version.exe"
-
-    $cas += New-Cas "binaire introuvable, repli payload" (New-Payload $socle) `
-        -Binaire $absent
-
-    $cas += New-Cas "binaire sans metadonnees, repli payload" (New-Payload $socle) `
-        -Binaire $sansVersion
-
-    $cas += New-Cas "binaire introuvable, version absente" (New-Payload @{
-        model     = @{ display_name = "Opus 5" }
-        workspace = @{ current_dir = $projet; project_dir = $projet }
-    }) -Binaire $absent
-
-    $cas += New-Cas "binaire introuvable, version non chaine" (New-Payload @{
-        model     = @{ display_name = "Opus 5" }
-        workspace = @{ current_dir = $projet; project_dir = $projet }
-        version   = 2226
-    }) -Binaire $absent
-
     # Segment d'abonnement. Le compte réel du poste n'en couvre qu'une forme, et
     # elle change avec l'abonnement de l'utilisateur : la configuration est donc
-    # détournée vers des fichiers maîtrisés, comme le binaire juste au-dessus.
+    # détournée vers des fichiers maîtrisés.
     $cas += New-Cas "abonnement max avec palier" (New-Payload $socle) `
         -Config (Join-Path $Racine "config-max.json")
 
@@ -1115,7 +1086,7 @@ function Get-Cas {
         -Config (Join-Path $Racine "aucune-config.json")
 
     # Détournement et coloration ensemble : l'abonnement doit sortir en chrome
-    # atténué, comme la version qui le suit, et non dans la couleur du thème.
+    # atténué, et non dans la couleur du thème.
     $cas += New-Cas "abonnement max avec couleur" (New-Payload $socle) `
         -Config (Join-Path $Racine "config-max.json") -AvecCouleur
 
@@ -1131,7 +1102,7 @@ function Get-Cas {
     # de Confirm-Ligne.
     $cas += New-Cas "modele blanc, ligne a sauver" (New-Payload @{
         model = @{ display_name = "   " }
-    }) -Binaire $absent
+    })
 
     return $cas
 }
@@ -1166,11 +1137,6 @@ function Invoke-Cas {
         Remove-Item Env:\NO_COLOR -ErrorAction SilentlyContinue
     } else {
         $env:NO_COLOR = "1"
-    }
-    if ($Cas.Binaire) {
-        $env:CLAUDE_STATUSLINE_BINAIRE = $Cas.Binaire
-    } else {
-        Remove-Item Env:\CLAUDE_STATUSLINE_BINAIRE -ErrorAction SilentlyContinue
     }
     if ($Cas.Config) {
         $env:CLAUDE_STATUSLINE_CONFIG = $Cas.Config
@@ -1266,7 +1232,6 @@ if ($Reference -and -not (Test-Path -LiteralPath $Reference)) {
 $racine = Join-Path ([System.IO.Path]::GetTempPath()) "statusline-bac-$PID"
 $localAppDataInitial = $env:LOCALAPPDATA
 $noColorInitial = $env:NO_COLOR
-$binaireInitial = $env:CLAUDE_STATUSLINE_BINAIRE
 $configInitiale = $env:CLAUDE_STATUSLINE_CONFIG
 
 try {
@@ -1360,11 +1325,6 @@ finally {
         Remove-Item Env:\NO_COLOR -ErrorAction SilentlyContinue
     } else {
         $env:NO_COLOR = $noColorInitial
-    }
-    if ($null -eq $binaireInitial) {
-        Remove-Item Env:\CLAUDE_STATUSLINE_BINAIRE -ErrorAction SilentlyContinue
-    } else {
-        $env:CLAUDE_STATUSLINE_BINAIRE = $binaireInitial
     }
     if ($null -eq $configInitiale) {
         Remove-Item Env:\CLAUDE_STATUSLINE_CONFIG -ErrorAction SilentlyContinue

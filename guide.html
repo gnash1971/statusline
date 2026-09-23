@@ -112,7 +112,7 @@
 
 <header class="entete">
   <h1>La ligne de statut, cas par cas
-    <small>Guide utilisateur de <code>statusline</code> pour Claude Code sous Windows — version 2.2.0</small>
+    <small>Guide utilisateur de <code>statusline</code> pour Claude Code sous Windows — version 2.3.0</small>
   </h1>
   <p>Cette page montre tout ce que la ligne de statut peut afficher, et pourquoi elle l'affiche
   ainsi. <strong>Toutes les figures sont de vraies sorties du programme</strong> : chaque image est
@@ -125,7 +125,7 @@
   <ol>
     <li><a href="#lire">Lire la capsule</a></li>
     <li><a href="#tete">La tête : l'abonnement</a></li>
-    <li><a href="#identite">L'identité : version, modèle, conduite de la session</a></li>
+    <li><a href="#identite">L'identité : modèle, conduite de la session</a></li>
     <li><a href="#emplacement">L'emplacement</a></li>
     <li><a href="#mesures">Les mesures : contexte et fenêtres</a></li>
     <li><a href="#paliers">Les paliers et les couleurs</a></li>
@@ -147,17 +147,17 @@ fond ; les caps arrondis, les jonctions et les deux bords fins sont tracés dans
 contour.</p>
 
 <figure class="ajustee">
-  <img src="guide/anatomie.svg" alt="La capsule complète et ses quatre compartiments : abonnement, version et modèle, emplacement, contexte et fenêtres">
+  <img src="guide/anatomie.svg" alt="La capsule complète et ses quatre compartiments : abonnement, modèle, emplacement, contexte et fenêtres">
   <figcaption><strong>Les quatre compartiments.</strong> La tête (abonnement) en terre cuite ; l'identité
-  (version, modèle, effort) et les mesures en ardoise ; l'emplacement en sauge. Le rang du dessus et
+  (modèle, effort) et les mesures en ardoise ; l'emplacement en sauge. Le rang du dessus et
   celui du dessous ferment le cadre : ce sont deux vraies lignes de texte, faites de huitièmes de
   bloc, que Claude Code affiche comme le reste.</figcaption>
 </figure>
 
 <p>Trois règles suffisent à lire tout ce qui suit :</p>
 <ul>
-  <li><strong>Ce qui est ordinaire se tait, ce qui s'écarte se voit.</strong> Un mode inhabituel, une
-  mise à jour en attente, une projection au-dessus du seuil : la ligne les marque. Le reste du temps,
+  <li><strong>Ce qui est ordinaire se tait, ce qui s'écarte se voit.</strong> Un mode inhabituel, un
+  contexte étendu, une projection au-dessus du seuil : la ligne les marque. Le reste du temps,
   elle ne dit que le nécessaire.</li>
   <li><strong>Ce qui manque se retire.</strong> Pas de compte lisible, pas de tête ; pas de dépôt
   Git, pas de parenthèses ; pas de mesure, pas de segment. La capsule se resserre au lieu d'afficher
@@ -187,23 +187,10 @@ limitation affichées à l'autre bout.</p>
 </figure>
 
 <!-- ------------------------------------------------------------------ -->
-<h2 id="identite">3. L'identité : version, modèle, conduite de la session</h2>
+<h2 id="identite">3. L'identité : modèle, conduite de la session</h2>
 
-<h3>La version de Claude Code</h3>
-<p>La version affichée est celle du <strong>binaire posé sur le disque</strong>
-(<code>%USERPROFILE%\.local\bin\claude.exe</code>), et non celle que la session a chargée en
-mémoire. Une mise à jour automatique remplace le binaire sans toucher au processus en cours : tant
-que la session n'a pas été relancée, les deux diffèrent — et c'est précisément ce que le segment
-sert à voir.</p>
-
-<figure>
-  <img src="guide/version-ecart.svg" alt="Deux lignes : la version en gris quand binaire et session concordent, en cyan quand le binaire du disque est plus récent que la session">
-  <figcaption><strong>Le gris ne dit rien, le cyan dit l'écart.</strong> Même texte dans les deux
-  cas — le numéro du binaire sur le disque — mais la teinte des marqueurs quand la session tourne
-  encore sur une version antérieure : une mise à jour attend le prochain lancement. Si le binaire
-  est introuvable, la ligne se rabat sur la version de la session, sans teinte : il n'y a pas
-  d'écart constaté, seulement une inconnue.</figcaption>
-</figure>
+<p>La version de Claude Code n'y figure plus depuis la 2.3.0 : un numéro qui ne change qu'à une
+mise à jour occupait une dizaine de colonnes pour rien le reste du temps.</p>
 
 <h3>Le modèle</h3>
 <p>Le nom vient de <code>model.display_name</code>. La <em>famille</em> du modèle — lue dans
@@ -248,7 +235,7 @@ qui gouverne la vitesse à laquelle se remplissent les fenêtres affichées plus
 
 <h3>Les marqueurs de mode</h3>
 <p>Deux états inhabituels de la session sont marqués dans la teinte des marqueurs, la même que le
-« 1M » et la version décalée : <strong><code>fast</code></strong> quand le mode rapide est actif
+« 1M » : <strong><code>fast</code></strong> quand le mode rapide est actif
 (<code>fast_mode</code>), <strong><code>sans réflexion</code></strong> quand la réflexion étendue
 est coupée (<code>thinking.enabled = false</code>). Un mode ordinaire ne s'écrit pas.</p>
 
@@ -270,8 +257,9 @@ situe ; la feuille et la branche en clair, ce qui distingue.</p>
 <figure>
   <img src="guide/lieux.svg" alt="Six lignes : racine du projet, sous-dossier, chemin profond replié, HEAD détachée, worktree, hors du projet">
   <figcaption><strong>Les six formes.</strong> Le chemin est affiché <em>depuis la racine du
-  projet</em> (<code>workspace.project_dir</code>) : « src » ou « tests » seuls ne diraient pas d'où
-  l'on parle. Au-delà de trois niveaux, les ancêtres intermédiaires se replient en « … ». La
+  projet</em> (<code>workspace.project_dir</code>) tant qu'il reste court : la racine, ou la racine
+  et un sous-dossier. Plus bas, seule la feuille reste, derrière « …\ » : c'est elle qui distingue
+  le dossier, et la ligne ne s'allonge pas avec la profondeur. La
   branche se lit dans <code>.git/HEAD</code>, en remontant depuis le répertoire courant ; une HEAD
   détachée donne son SHA abrégé ; une session <code>--worktree</code> reçoit sa branche du payload.
   Hors du projet, ou hors de tout dépôt, il reste la feuille seule.</figcaption>
@@ -420,7 +408,7 @@ palier critique.</p>
     <tr><td><span class="pastille" style="background:rgb(74,61,28)"></span>ambre sombre</td><td>fond des mesures en alerte</td><td>74 · 61 · 28</td></tr>
     <tr><td><span class="pastille" style="background:rgb(83,40,37)"></span>rouge sombre</td><td>fond des mesures au critique</td><td>83 · 40 · 37</td></tr>
     <tr><td><span class="pastille" style="background:rgb(124,132,142)"></span>gris de contour</td><td>caps, jonctions, bords, points séparateurs</td><td>124 · 132 · 142</td></tr>
-    <tr><td><span class="pastille" style="background:rgb(147,197,208)"></span>cyan des marqueurs</td><td>1M, fast, sans réflexion, version décalée</td><td>147 · 197 · 208</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(147,197,208)"></span>cyan des marqueurs</td><td>1M, fast, sans réflexion</td><td>147 · 197 · 208</td></tr>
   </tbody>
 </table>
 
@@ -438,17 +426,17 @@ moins une cellule de marge).</p>
   <figcaption><strong>120 colonnes :</strong> une seule capsule.</figcaption>
 </figure>
 <figure class="ajustee">
-  <img src="guide/largeur-90.svg" alt="À 90 colonnes, les mesures passent dans une seconde capsule">
-  <figcaption><strong>90 colonnes :</strong> les mesures ne tiennent plus à la suite de
+  <img src="guide/largeur-70.svg" alt="À 70 colonnes, les mesures passent dans une seconde capsule">
+  <figcaption><strong>70 colonnes :</strong> les mesures ne tiennent plus à la suite de
   l'emplacement, elles ouvrent une deuxième capsule. La coupe se fait d'abord <em>entre
   compartiments</em>.</figcaption>
 </figure>
 <figure class="ajustee">
-  <img src="guide/largeur-60.svg" alt="À 60 colonnes, trois capsules : identité, emplacement, mesures">
-  <figcaption><strong>60 colonnes :</strong> trois capsules, une par groupe. Quand un compartiment
-  seul déborde encore, la coupe descend <em>entre segments</em>, chaque morceau gardant la teinte
-  de son compartiment ; un segment seul plus large que la console s'émet tel quel, il n'y a plus
-  rien à faire.</figcaption>
+  <img src="guide/largeur-40.svg" alt="À 40 colonnes, trois capsules : la tête, l'identité et l'emplacement, puis les mesures coupées en deux">
+  <figcaption><strong>40 colonnes :</strong> le compartiment des mesures, seul, déborde encore ;
+  la coupe descend alors <em>entre segments</em>, chaque morceau gardant la teinte de son
+  compartiment. Un segment seul plus large que la console s'émet tel quel, il n'y a plus rien à
+  faire.</figcaption>
 </figure>
 
 <p>Le nombre de rangs croît donc avec l'étroitesse de la fenêtre, comme le ferait l'enroulement de
@@ -535,7 +523,6 @@ standard. Les champs lus :</p>
   <thead><tr><th>Champ</th><th>Segment</th><th>Remarque</th></tr></thead>
   <tbody>
     <tr><td><code>model.display_name</code>, <code>model.id</code></td><td>modèle, famille</td><td>l'identifiant porte le suffixe <code>[1m]</code> en contexte étendu</td></tr>
-    <tr><td><code>version</code></td><td>version</td><td>repli, et comparaison au binaire du disque</td></tr>
     <tr><td><code>workspace.current_dir</code>, <code>workspace.project_dir</code>, <code>cwd</code></td><td>emplacement</td><td><code>cwd</code> double <code>current_dir</code></td></tr>
     <tr><td><code>worktree.branch</code></td><td>branche</td><td>sessions <code>--worktree</code> seulement</td></tr>
     <tr><td><code>context_window.used_percentage</code>, <code>context_window.context_window_size</code></td><td>ctx, marqueur 1M</td><td>nul avant le premier appel</td></tr>
@@ -547,7 +534,6 @@ standard. Les champs lus :</p>
 
 <p>Un exemple fabriqué, tel que le générateur de ce guide en soumet :</p>
 <pre><code>{
-  "version": "2.1.278",
   "model": { "id": "claude-opus-5", "display_name": "Opus 5" },
   "workspace": { "current_dir": "D:\\projets\\atelier\\rust\\src", "project_dir": "D:\\projets\\atelier" },
   "effort": { "level": "high" },
@@ -565,7 +551,7 @@ standard. Les champs lus :</p>
 Le script fabrique un bac isolé sous <code>%TEMP%</code> — dépôts Git factices, configurations
 d'abonnement, relevés de <code>/usage</code>, cache — et n'approche ni le compte, ni le cache, ni les
 dépôts du poste. Chaque cas est exécuté sous une console cachée redimensionnée à la largeur voulue,
-ce qui donne les vrais replis à 120, 90 et 60 colonnes ; la sortie ANSI est ensuite convertie en
+ce qui donne les vrais replis à 120, 70 et 40 colonnes ; la sortie ANSI est ensuite convertie en
 SVG, les arcs et les blocs tracés en formes pour ne pas dépendre des polices du lecteur.</p>
 
 <pre><code>pwsh -File guide\generer-guide.ps1            # toutes les figures, dans guide\

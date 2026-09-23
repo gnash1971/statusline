@@ -42,7 +42,7 @@ pub(crate) const SEPARATEUR_INTERNE: &str = " ";
 // ---------------------------------------------------------------------------
 //
 // La ligne compte quatre familles — sous quel régime (abonnement), ce qui
-// tourne (version, modèle), où l'on est (emplacement), ce que la session
+// tourne (le modèle), où l'on est (emplacement), ce que la session
 // consomme (contexte et fenêtres) — et chacune est désormais un **compartiment**
 // d'une capsule, avec son fond. Le rang supérieur de séparation ne s'écrit donc
 // plus par un caractère mais par la forme : la jonction de deux fonds.
@@ -135,20 +135,10 @@ pub(crate) const MARGE_LARGEUR: usize = 1;
 /// Libellé affiché quand le modèle est inconnu, et repli ultime sur erreur.
 pub(crate) const MODELE_PAR_DEFAUT: &str = "Claude";
 
-/// Préfixe du segment de version, en tête de ligne. Réduit au « v » seul : le
-/// nom du produit ne varie jamais et occupait douze caractères à l'endroit le
-/// plus exposé de la ligne.
-pub(crate) const PREFIXE_VERSION: &str = "v";
-
-/// Emplacement du binaire, relatif au profil utilisateur : c'est là que
-/// l'installation « native » le pose. `CLAUDE_STATUSLINE_BINAIRE` désigne un
-/// autre chemin, absolu, sur un poste installé ailleurs.
-pub(crate) const CHEMIN_BINAIRE_RELATIF: &str = ".local\\bin\\claude.exe";
-
 /// Configuration de Claude Code, relative au profil utilisateur : c'est là que
 /// se lit l'abonnement du compte connecté, le payload n'en disant rien.
-/// `CLAUDE_STATUSLINE_CONFIG` désigne un autre chemin, sur le même modèle que
-/// [`CHEMIN_BINAIRE_RELATIF`]. Voir [`crate::abonnement`].
+/// `CLAUDE_STATUSLINE_CONFIG` désigne un autre chemin, absolu, sur un poste
+/// installé ailleurs. Voir [`crate::abonnement`].
 pub(crate) const CHEMIN_CONFIG_RELATIF: &str = ".claude.json";
 
 /// Types d'organisation et libellés d'abonnement correspondants.
@@ -163,8 +153,9 @@ pub(crate) const CHEMIN_CONFIG_RELATIF: &str = ".claude.json";
 /// **Le mot « Claude » est tombé le 26/08/2026**, second lot de retouches. Il
 /// occupait sept colonnes en tête de ligne pour ne rien distinguer : dans une
 /// ligne de statut de Claude Code, aucun autre éditeur ne dispute le nom. C'est
-/// mot pour mot l'argument qui avait réduit « Claude Code v » à
-/// [`PREFIXE_VERSION`], appliqué au segment voisin.
+/// mot pour mot l'argument qui avait réduit « Claude Code v » au « v » seul,
+/// appliqué au segment voisin — celui de version, retiré depuis, le
+/// 23/09/2026.
 ///
 /// [`embellir`](crate::abonnement) élague le même préfixe sur les valeurs hors
 /// table, faute de quoi un abonnement inventé après cette version s'afficherait
@@ -608,8 +599,14 @@ pub(crate) const LARGEUR_VALEUR: usize = 3;
 /// jauge suggérerait une fatalité qu'il n'a pas.
 pub(crate) const BLOCS_JAUGE: [&str; 7] = ["░░", "▒░", "▓░", "█░", "█▒", "█▓", "██"];
 
-/// Nombre de segments de chemin affichés avant repli en « racine\…\feuille ».
-pub(crate) const PROFONDEUR_MAX_CHEMIN: usize = 3;
+/// Nombre de segments de chemin affichés avant repli en « …\feuille » —
+/// « racine\…\feuille » jusqu'au 23/09/2026.
+///
+/// Deux, et non plus trois, depuis le même jour : l'utilisateur tient déjà
+/// « PY_xl\.claude\user-config » pour un chemin long. La racine suivie d'un
+/// seul sous-dossier reste donc entière, tout ce qui descend plus bas se
+/// réduit à sa feuille.
+pub(crate) const PROFONDEUR_MAX_CHEMIN: usize = 2;
 
 /// Remontée maximale à la recherche d'un « .git ». Un lien mal formé ne peut
 /// ainsi pas faire tourner la boucle indéfiniment, et 32 niveaux dépassent

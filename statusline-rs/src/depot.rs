@@ -1,10 +1,9 @@
 //! Branche Git courante, lue sur le disque — première moitié de la section 5.
 //!
-//! Deux informations manquent au contrat d'entrée et se lisent donc sur le
-//! disque, ici la branche et dans [`crate::binaire`] la version installée. Dans
-//! les deux cas la même contrainte gouverne : la ligne se rafraîchit souvent,
-//! et lancer un processus à chaque fois se paierait cher. Tout passe par des
-//! lectures de fichier.
+//! La branche manque au contrat d'entrée et se lit donc sur le disque — comme
+//! la version installée jusqu'au retrait de son segment, le 23/09/2026. La même
+//! contrainte gouverne : la ligne se rafraîchit souvent, et lancer un processus
+//! à chaque fois se paierait cher. Tout passe par des lectures de fichier.
 //!
 //! « worktree.branch » n'est renseigné que pour les sessions lancées avec
 //! `--worktree`. La branche est donc lue directement dans « .git/HEAD », plutôt

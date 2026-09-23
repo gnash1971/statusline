@@ -2041,3 +2041,70 @@ l'exécutable et empreinte dans les notes. Livrée par `deploy-statusline.bat`
 sans drapeau — incrément patch *tag-aware*, `compiler-statusline.bat /test`,
 harnais, reflet, push, Release. Le comportement visible ne change pas : même
 chaîne de version lue, même segment.
+
+## 25. Le segment de version retiré, le chemin replié sur sa feuille — 23/09/2026
+
+Deux demandes de l'utilisateur, le même message : ne plus voir le numéro de
+version, et un chemin long affiché `…\feuille` plutôt que
+`racine\…\feuille`.
+
+### Ce qui part
+
+`segment_version`, `version_decalee` et leur test ; le module `binaire.rs`
+entier, avec la lecture bornée du §24 ; `PREFIXE_VERSION` et
+`CHEMIN_BINAIRE_RELATIF` dans `reglages.rs` ; la variable
+`CLAUDE_STATUSLINE_BINAIRE`. Le compartiment d'identité ne porte plus que le
+segment de modèle. Le signal d'une mise à jour en attente — la teinte cyan
+posée le 26/08/2026 quand binaire et session divergent — part avec le
+segment : la question n'a pas été posée à part, la demande visant le numéro
+lui-même. Les features `windows-sys` restent : `Win32_Storage_FileSystem`
+sert aussi `CreateFileW`, par lequel la sonde de largeur ouvre `CONOUT$`.
+
+### Le repli
+
+`compresser_chemin` rend `["…", feuille]` au-delà de
+`PROFONDEUR_MAX_CHEMIN`. L'ellipse reste le caractère `…`, une colonne, comme
+avant ; elle tombe parmi les ancêtres, donc en sourd, la feuille en clair.
+
+Le seuil a d'abord été laissé à trois, et a baissé à **deux** dans l'heure :
+l'utilisateur, placé dans `.claude\user-config`, a vu
+`PY_xl\.claude\user-config` en entier et l'a récusé sur capture (« Aïe »).
+Trois segments font donc déjà un chemin long : `PY_xl` et `PY_xl\.claude`
+restent entiers, `PY_xl\.claude\user-config` devient `…\user-config` et
+`PY_xl\PyScripts2\_genrsu_\rust\coeur` `…\coeur`. Les tests
+`l_emplacement_distingue_la_feuille_des_ancetres` et
+`repertoire_relatif_au_projet` fixent la forme : deux segments entiers, trois
+repliés.
+
+### L'oracle, dégelé le temps de deux retouches
+
+Les deux changements touchent la sortie sous `NO_COLOR` — la version sur
+**tous** les cas. C'est le critère du README (« Ce qui reste du script
+PowerShell ») : ce qui ferait diverger le harnais entier se porte. Les deux
+retouches sont donc passées dans `statusline.ps1` à l'identique
+(`Get-SegmentVersion`, `Get-VersionBinaire`, `Find-Binaire` supprimés,
+`Compress-Chemin` réécrit), et son en-tête le dit. Le harnais perd ses quatre
+cas `binaire …` et le détournement de `CLAUDE_STATUSLINE_BINAIRE` : 135 cas,
+**109 comparés, aucune divergence**, 26 colorés sautés.
+
+86 tests, clippy `-D warnings` et `fmt` propres. Version **2.3.0** —
+changement visible, comme 2.1.0 et 2.2.0. Déployée sur le poste par
+`compiler-statusline.bat /test`, **pas publiée** : copie horodatée des sources
+dans `.backups\20260923-153622_avant-sans-version\`.
+
+### Les documents du dépôt public
+
+Repris avant la publication : `README.md` (exemples, tableau des sources,
+quinze modules, État), `SECURITY.md` (plus de lecture des métadonnées de
+`claude.exe` ; la fraîcheur du binaire se juge à son empreinte), `guide.html`
+(section de la version remplacée par une phrase, légendes, table des teintes
+et du contrat, exemple de payload) et `guide\generer-guide.ps1` (cas
+`version-ecart`, faux binaire et `CLAUDE_STATUSLINE_BINAIRE` retirés ; la
+figure des lieux montre un sous-dossier entier puis un chemin replié).
+
+Un effet de bord : la capsule a perdu une vingtaine de colonnes et tenait
+entière à 90, si bien que les figures de largeur ne montraient plus de repli.
+Elles passent de 120 / 90 / 60 à **120 / 70 / 40** — un rang, coupe entre
+compartiments, coupe entre segments —, `largeur-90.svg` et `largeur-60.svg`
+laissant place à `largeur-70.svg` et `largeur-40.svg`. Figures régénérées,
+copie préalable du dossier dans `.backups\20260923-160332_avant-docs-depot\`.

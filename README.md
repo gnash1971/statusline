@@ -1,14 +1,14 @@
 # statusline
 
 Ligne de statut pour [Claude Code](https://claude.com/claude-code) sous
-Windows : abonnement, version, modèle et effort, emplacement, contexte et
+Windows : abonnement, modèle et effort, emplacement, contexte et
 fenêtres de limitation — dans une capsule à compartiments colorés, rendue par
 un binaire Rust en une quinzaine de millisecondes.
 
 ```
- ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
- Pro  v2.1.259 · Opus 5 xhigh  PY_xl\PyScripts\_plus-rust_ 
- ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+ ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+ Pro  Opus 5 xhigh  …\_plus-rust_ 
+ ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
  ctx 34% · 5h ▒░ 20% → 41% 15:00 · 7j █░ 45% 
  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
@@ -17,7 +17,7 @@ un binaire Rust en une quinzaine de millisecondes.
 Ici la forme dépliée, celle d'une console étroite ; sur une console large la
 capsule tient sur un rang :
 
-![La capsule sur un rang : abonnement, version et modèle, emplacement, contexte et fenêtres](guide/anatomie.svg)
+![La capsule sur un rang : abonnement, modèle, emplacement, contexte et fenêtres](guide/anatomie.svg)
 
 Le **[guide utilisateur](guide.html)** montre chaque cas d'usage — abonnements,
 marqueurs, emplacement, jauge, projections, paliers, repli en largeur — sur de
@@ -25,7 +25,7 @@ vraies sorties du binaire, et les explique. Sous `NO_COLOR`, tout ce qui n'est
 que forme se retire :
 
 ```
-Pro v2.1.259 · Opus 5 xhigh PY_xl\PyScripts\_plus-rust_ ctx 34% · 5h ▒░ 20% → 41% 15:00 · 7j █░ 45%
+Pro Opus 5 xhigh …\_plus-rust_ ctx 34% · 5h ▒░ 20% → 41% 15:00 · 7j █░ 45%
 ```
 
 ## Ce qu'elle affiche
@@ -33,9 +33,8 @@ Pro v2.1.259 · Opus 5 xhigh PY_xl\PyScripts\_plus-rust_ ctx 34% · 5h ▒░ 20
 | Segment | Source |
 |---|---|
 | Abonnement (Pro, Max 5x/20x, Team, Enterprise) | `oauthAccount` de `~/.claude.json` — le payload n'en dit rien |
-| Version de Claude Code | métadonnées du binaire installé |
 | Modèle, fenêtre au-delà de 200 k, effort, marqueurs `fast` / `sans réflexion` | payload |
-| Emplacement relatif au projet, branche Git | payload, `.git/HEAD` |
+| Emplacement relatif au projet (`…\feuille` au-delà d'un sous-dossier), branche Git | payload, `.git/HEAD` |
 | Contexte occupé | payload, paliers 80 / 90 % |
 | Fenêtre 5 h : jauge, valeur, projection à la remise à zéro ou `épuisé`, heure | payload + rythme mesuré, mémorisé dans un cache |
 | Fenêtre 7 j : jauge, valeur, marqueurs `~` (mémorisée) et `≈` (estimée) | la plus remplie de la fenêtre globale et de la fenêtre propre au modèle relevée par `/usage` ; seuils selon la famille du modèle |
@@ -84,7 +83,7 @@ pouvant être écrasé mais bien renommé.
 
 | Chemin | Rôle |
 |---|---|
-| `statusline-rs/` | Le crate : `serde_json` et `windows-sys`, rien d'autre ; seize modules, tests unitaires à attendus figés |
+| `statusline-rs/` | Le crate : `serde_json` et `windows-sys`, rien d'autre ; quinze modules, tests unitaires à attendus figés |
 | `statusline.ps1` | Le script PowerShell d'origine : **oracle** du harnais, et repli sans compilation |
 | `test-statusline.ps1` | Harnais de non-régression : les cas sont rejoués dans un `%LOCALAPPDATA%` isolé, sortie 1 à la première divergence |
 | `compiler-statusline.bat` | Compile et déploie ; `/test` fait précéder le dépôt des tests du crate et du harnais, `/check` compile et compare sans rien écrire |
@@ -107,7 +106,9 @@ compiler-statusline.bat /check
 Depuis la capsule (2.0.0), l'oracle est gelé : sous couleur, la sortie du
 binaire a une autre forme — fonds, caps, cadre — et le harnais compare les deux
 sous `NO_COLOR`, où elle est, octet pour octet, celle du script. Les cas
-colorés sont couverts par les tests du crate.
+colorés sont couverts par les tests du crate. Seule exception : les deux
+retouches de la 2.3.0 changent la sortie sous `NO_COLOR`, et ont donc été
+portées dans l'oracle à l'identique.
 
 La CI (`.github/workflows/ci.yml`) rejoue `cargo test`, `cargo build
 --release`, `cargo fmt --check` et `cargo clippy --all-targets -- -D warnings`
@@ -131,9 +132,11 @@ signature exigée) ; les commits et les tags sont signés.
 
 ## État
 
-Version 2.2.1 — lecture bornée du bloc de version (une alerte CodeQL fermée par
-le code plutôt qu'écartée) ; 2.2.0 avait apporté la capsule cadrée sur trois
-rangs. L'histoire, les mesures et les décisions sont dans
+Version 2.3.0 — le segment de version est retiré, avec la lecture des
+métadonnées de `claude.exe` qui le servait, et l'emplacement se replie en
+`…\feuille` dès qu'il descend plus bas qu'un sous-dossier du projet. 2.2.1
+avait borné la lecture de ce bloc de version (une alerte CodeQL fermée par le
+code plutôt qu'écartée), 2.2.0 apporté la capsule cadrée sur trois rangs. L'histoire, les mesures et les décisions sont dans
 `docs/statusline-rust.md`.
 
 ## Licence

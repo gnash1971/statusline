@@ -9,7 +9,7 @@
 
     Le binaire mesure la largeur de la console qui l'a lancé. Chaque cas est
     donc exécuté sous un conhost caché, redimensionné à la largeur voulue par
-    « mode con » : c'est ce qui permet de montrer le repli à 120, 90 et 60
+    « mode con » : c'est ce qui permet de montrer le repli à 120, 70 et 40
     colonnes quelle que soit la fenêtre d'où ce script est lancé.
 
     La sortie ANSI est convertie cellule par cellule en SVG. Les fonds et les
@@ -111,10 +111,6 @@ function Initialize-Bac {
     # Hors de tout dépôt.
     $null = New-Item -ItemType Directory -Path (Join-Path $bac 'ailleurs\notes')
 
-    # Faux binaire sans métadonnées : la version affichée est alors celle du
-    # payload, ce qui rend les figures indépendantes du poste.
-    [System.IO.File]::WriteAllText((Join-Path $bac 'sans-version.exe'), 'pas un exécutable', $utf8SansBom)
-
     # Configurations factices : l'abonnement se lit dans ~/.claude.json.
     $configs = [ordered]@{
         'pro'         = '{"oauthAccount":{"organizationType":"claude_pro"}}'
@@ -169,11 +165,9 @@ function New-Socle {
         [string]$Dossier = $atelier,
         [string]$Projet = $atelier,
         [string]$Modele = 'Opus 5',
-        [string]$Id = 'claude-opus-5',
-        [string]$Version = '2.1.278'
+        [string]$Id = 'claude-opus-5'
     )
     return [ordered]@{
-        version   = $Version
         model     = [ordered]@{ id = $Id; display_name = $Modele }
         workspace = [ordered]@{ current_dir = $Dossier; project_dir = $Projet }
         cwd       = $Dossier
@@ -222,7 +216,6 @@ function Invoke-Statusline {
         [int]$Largeur,
         [string]$Cache,
         [string]$Config,
-        [string]$Binaire,
         [switch]$SansCouleur
     )
 
@@ -246,7 +239,6 @@ function Invoke-Statusline {
     $env:LOCALAPPDATA = $bac
     [System.Environment]::SetEnvironmentVariable('NO_COLOR', $(if ($SansCouleur) { '1' } else { $null }))
     [System.Environment]::SetEnvironmentVariable('CLAUDE_STATUSLINE_CONFIG', $(if ($Config) { $Config } else { $null }))
-    [System.Environment]::SetEnvironmentVariable('CLAUDE_STATUSLINE_BINAIRE', $(if ($Binaire) { $Binaire } else { $null }))
 
     # conhost.exe explicite : la console classique, même si Windows Terminal est
     # le terminal par défaut du poste — sa fenêtre reste cachée. « mode con » y
@@ -550,6 +542,7 @@ function New-Svg {
 # --------------------------------------------------------------------------
 
 function Get-Cas {
+    $unNiveau = Join-Path $atelier 'rust'
     $sousDossier = Join-Path $atelier 'rust\src'
     $profond = Join-Path $atelier 'rust\src\noyau\api'
     $detache = Join-Path $bac 'detache'
@@ -568,7 +561,7 @@ function Get-Cas {
 
     return @(
         @{ Id = 'anatomie'; Largeur = 120
-           Legendes = @('abonnement', 'version · modèle', 'emplacement', 'contexte · fenêtres')
+           Legendes = @('abonnement', 'modèle', 'emplacement', 'contexte · fenêtres')
            Sorties = @(@{ Payload = (Json $complet); Cache = $ancrage }) }
 
         @{ Id = 'tete-abonnements'; Largeur = 120; Sorties = @(
@@ -579,12 +572,6 @@ function Get-Cas {
             @{ Etiquette = 'claude_enterprise'; Payload = (Json $identite); Config = 'enterprise' }
             @{ Etiquette = 'type inconnu de la table : claude_ultra_plus'; Payload = (Json $identite); Config = 'inconnu' }
             @{ Etiquette = 'aucun compte lisible dans ~/.claude.json'; Payload = (Json $identite); Config = 'sans-compte' }
-        ) }
-
-        @{ Id = 'version-ecart'; Largeur = 120; Sorties = @(
-            @{ Etiquette = 'binaire et session à la même version'; Payload = (Json $identite) }
-            @{ Etiquette = 'binaire sur le disque plus récent que la session (mise à jour au prochain lancement)'
-               Payload = (Json (New-Socle -Version '2.1.259')); Binaire = 'reel' }
         ) }
 
         @{ Id = 'modeles'; Largeur = 120; Sorties = @(
@@ -612,8 +599,8 @@ function Get-Cas {
 
         @{ Id = 'lieux'; Largeur = 120; Sorties = @(
             @{ Etiquette = 'à la racine du projet, sur main'; Payload = (Json $identite) }
-            @{ Etiquette = 'dans un sous-dossier : le chemin depuis la racine du projet'; Payload = (Json (New-Socle -Dossier $sousDossier)) }
-            @{ Etiquette = 'au-delà de trois niveaux : les ancêtres se replient en « … »'; Payload = (Json (New-Socle -Dossier $profond)) }
+            @{ Etiquette = 'un niveau sous la racine : le chemin depuis la racine du projet'; Payload = (Json (New-Socle -Dossier $unNiveau)) }
+            @{ Etiquette = 'plus bas : seule la feuille reste, derrière « … »'; Payload = (Json (New-Socle -Dossier $profond)) }
             @{ Etiquette = 'HEAD détachée : le SHA abrégé remplace la branche'; Payload = (Json (New-Socle -Dossier $detache -Projet $detache)) }
             @{ Etiquette = 'session --worktree : la branche vient du payload'; Payload = (Json (Avec (New-Socle -Dossier $sousDossier) ([ordered]@{ worktree = [ordered]@{ branch = 'feature/paie' } }))) }
             @{ Etiquette = 'hors du projet, hors de tout dépôt : la feuille seule'; Payload = (Json (New-Socle -Dossier $ailleurs)) }
@@ -657,8 +644,11 @@ function Get-Cas {
         ) }
 
         @{ Id = 'largeur-120'; Largeur = 120; Cadre = 'console'; Sorties = @(@{ Payload = (Json $complet); Cache = $ancrage }) }
-        @{ Id = 'largeur-90'; Largeur = 90; Cadre = 'console'; Sorties = @(@{ Payload = (Json $complet); Cache = $ancrage }) }
-        @{ Id = 'largeur-60'; Largeur = 60; Cadre = 'console'; Sorties = @(@{ Payload = (Json $complet); Cache = $ancrage }) }
+        # Largeurs recalées le 23/09/2026 : sans la version et avec le chemin
+        # replié sur sa feuille, la capsule a perdu une vingtaine de colonnes et
+        # tenait entière à 90 ; 70 et 40 montrent les deux coupes.
+        @{ Id = 'largeur-70'; Largeur = 70; Cadre = 'console'; Sorties = @(@{ Payload = (Json $complet); Cache = $ancrage }) }
+        @{ Id = 'largeur-40'; Largeur = 40; Cadre = 'console'; Sorties = @(@{ Payload = (Json $complet); Cache = $ancrage }) }
 
         @{ Id = 'sans-couleur'; Largeur = 120; Sorties = @(@{ Payload = (Json $complet); Cache = $ancrage; SansCouleur = $true }) }
 
@@ -689,21 +679,17 @@ $environnementInitial = @{
     LOCALAPPDATA               = $env:LOCALAPPDATA
     NO_COLOR                   = $env:NO_COLOR
     CLAUDE_STATUSLINE_CONFIG   = $env:CLAUDE_STATUSLINE_CONFIG
-    CLAUDE_STATUSLINE_BINAIRE  = $env:CLAUDE_STATUSLINE_BINAIRE
 }
 
 try {
     Initialize-Bac
-    $sansVersion = Join-Path $bac 'sans-version.exe'
     $total = 0
     foreach ($cas in (Get-Cas | Where-Object { $_.Id -like $Filtre })) {
         $sorties = foreach ($spec in $cas.Sorties) {
             $config = if ($spec.ContainsKey('Config')) { Get-CheminConfig $spec.Config } else { Get-CheminConfig 'max5x' }
-            # 'reel' : le binaire du poste, s'il est là ; sinon le faux, sans version.
-            $binaire = if ($spec.ContainsKey('Binaire') -and $spec.Binaire -eq 'reel') { '' } else { $sansVersion }
             $texte = Invoke-Statusline -Payload $spec.Payload -Largeur $cas.Largeur `
                 -Cache $(if ($spec.ContainsKey('Cache')) { $spec.Cache } else { '' }) `
-                -Config $config -Binaire $binaire `
+                -Config $config `
                 -SansCouleur:($spec.ContainsKey('SansCouleur') -and $spec.SansCouleur)
             @{
                 Rangs     = (ConvertFrom-Ansi $texte)

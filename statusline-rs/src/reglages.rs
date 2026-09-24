@@ -106,6 +106,21 @@ pub(crate) const JONCTION: &str = "\u{E0B5}";
 /// les bords qui ferment la forme.
 pub(crate) const RVB_CONTOUR: &str = "124;132;142";
 
+/// Encres du contour d'une mesure en alerte et au palier critique — 24/09/2026,
+/// chantier « mesures », piste B.
+///
+/// Autour d'une mesure qui a franchi un seuil, les deux bords et l'arc qui la
+/// ferme prennent l'encre même de ses valeurs — l'ambre de [`CODE_ALERTE`], le
+/// corail de [`CODE_CRITIQUE`] — au lieu du gris de [`RVB_CONTOUR`] : l'alerte
+/// se voit du coin de l'œil, sur le cadre, sans une colonne de plus. L'arc qui
+/// sépare deux mesures prend l'encre de la plus grave des deux ; une mesure
+/// critique bordée d'un arc gris paraissait ouverte.
+///
+/// Triplets nus, comme [`RVB_CONTOUR`] ; un test vérifie qu'ils restent ceux
+/// des deux séquences de palier.
+pub(crate) const RVB_CONTOUR_ALERTE: &str = "242;171;63";
+pub(crate) const RVB_CONTOUR_CRITIQUE: &str = "249;148;138";
+
 /// Bord haut du cadre : le huitième de bloc inférieur `▁` (`U+2581`), répété
 /// sur le rang **au-dessus** de la capsule, d'une colonne après le cap gauche à
 /// la colonne avant le cap droit. Posé au bas de sa cellule, il affleure le
@@ -523,12 +538,31 @@ pub(crate) const CODE_MARQUEUR: &str = "38;2;147;197;208";
 /// tenir sur fond sombre comme clair ; il n'a plus qu'un fond à tenir.
 pub(crate) const CODE_ATTENUE: &str = "38;2;169;176;184";
 
-/// Séquence SGR de la **piste** de la jauge : le `░` du vide, en `#525965`,
-/// un ton au-dessus de l'ardoise. Décor : il ne porte aucune valeur, et sa
-/// discrétion est le but — c'est le plein qui se lit. Sous
-/// `adjustIndistinguishableColors: "always"`, Windows Terminal pourrait relever
-/// un gris trop proche du fond ; celui-ci en est à 1,5:1, à vérifier à l'écran.
-pub(crate) const CODE_PISTE: &str = "38;2;82;89;101";
+/// Rainures de la jauge fine, une par fond de palier — 24/09/2026, chantier
+/// « mesures », piste C.
+///
+/// La rainure est le **fond** des deux cellules de la jauge : le huitième de
+/// bloc y trace le plein dans l'encre du palier, le reste de la cellule laisse
+/// voir la rainure. Un ton au-dessus du fond du segment — 1,46:1 sur
+/// l'ardoise, 1,58:1 sur l'ambre sombre, 1,44:1 sur le rouge sombre —, et le
+/// plein y tient 6,1:1 en texte plein, 3,4:1 en ambre, 4,0:1 en corail,
+/// au-dessus du 3:1 d'un élément graphique.
+///
+/// Celle de l'ardoise est l'ancienne **piste** `#525965`, l'encre du `░` vide
+/// de la jauge à sept crans (`CODE_PISTE`, du 19/09 au 24/09/2026), passée de
+/// l'avant-plan au fond. Le §23 du dossier se demandait si
+/// `adjustIndistinguishableColors: "always"` relèverait ce gris à 1,5:1 de
+/// l'ardoise ; d'après sa description, le réglage ne touche qu'aux
+/// avant-plans, et un fond lui échappe.
+///
+/// Claire plutôt que sombre, sur comparaison à l'écran : une rainure sombre
+/// (`41;45;52`) prenait presque la teinte du fond du terminal sous l'acrylique
+/// — relevé entre `37,37,36` et `56,53,49` sur la même capture — et se lisait
+/// comme une fente dans la capsule, changeante avec ce qui passe derrière la
+/// fenêtre. La claire se lit comme une piste, quel que soit l'arrière-plan.
+pub(crate) const RVB_RAINURE_CORPS: &str = "82;89;101";
+pub(crate) const RVB_RAINURE_ALERTE: &str = "106;90;48";
+pub(crate) const RVB_RAINURE_CRITIQUE: &str = "112;62;58";
 
 // Les deux pastilles — `CODE_PASTILLE`, vert 22 sur 157, du 21/08 au 19/09/2026,
 // et `CODE_PASTILLE_ABONNEMENT`, teinte de marque sur `#300E00`, du 26/08 au
@@ -554,6 +588,12 @@ pub(crate) const LARGEUR_VALEUR: usize = 3;
 
 /// Crans de la micro-jauge, du plus vide au plus plein — **deux cellules depuis
 /// le 26/08/2026**, second lot de retouches.
+///
+/// **Sous `NO_COLOR` seulement depuis le 24/09/2026.** En couleur, c'est la
+/// jauge fine de [`HUITIEMES_JAUGE`] qui sert, seize crans sur une rainure ;
+/// ici la ligne reste, octet pour octet, celle que le harnais compare à
+/// l'oracle. Ce qui suit reste vrai de cette table, et dit pourquoi elle
+/// comptait sept crans.
 ///
 /// Un nombre se lit, un remplissage se voit. La jauge donne l'état d'une fenêtre
 /// avant que l'œil n'atteigne le chiffre, pour deux colonnes — là où une jauge à
@@ -591,13 +631,38 @@ pub(crate) const LARGEUR_VALEUR: usize = 3;
 /// cette table, quelle que soit la largeur des crans. Passer de quatre à sept
 /// n'a donc rien demandé d'autre que cette table — et une jauge à seize crans
 /// resterait hors d'atteinte sans changer de police, les blocs partiels
-/// `▏▎▍▌▋▊▉` étant absents de Consolas comme les blocs de hauteur.
+/// `▏▎▍▌▋▊▉` étant absents de Consolas comme les blocs de hauteur. Le
+/// 24/09/2026 l'a démenti pour ce terminal-ci : Windows Terminal trace ces
+/// blocs lui-même, sans les demander à la police — voir [`HUITIEMES_JAUGE`].
 ///
 /// La jauge est réservée aux **fenêtres de limitation** et ne paraît pas sur le
 /// contexte. La distinction est de fond : une fenêtre se remplit vers un
 /// plafond qu'on subit, alors que le contexte se compacte — lui donner une
 /// jauge suggérerait une fatalité qu'il n'a pas.
 pub(crate) const BLOCS_JAUGE: [&str; 7] = ["░░", "▒░", "▓░", "█░", "█▒", "█▓", "██"];
+
+/// Huitièmes de la jauge fine, du vide au plein — 24/09/2026, chantier
+/// « mesures », piste C : le blanc de la cellule vide, puis `▏ ▎ ▍ ▌ ▋ ▊ ▉ █`
+/// (`U+258F` à `U+2588`).
+///
+/// Deux cellules, seize crans : la cellule de gauche se remplit d'abord,
+/// huitième par huitième, puis celle de droite — la sémantique de
+/// [`BLOCS_JAUGE`], à une résolution plus que doublée, 6,25 points par cran
+/// contre 14,3. Le vide n'est pas un glyphe mais la **rainure**, un fond de
+/// cellule — voir [`RVB_RAINURE_CORPS`].
+///
+/// Ces glyphes ne sont pas dans Consolas, et c'est ce qui avait suspendu la
+/// jauge à seize crans le 26/08/2026. Windows Terminal 1.24 les trace
+/// lui-même, comme les caps Powerline : relevé au pixel le 24/09/2026 sur une
+/// capture en corps 8, huit largeurs distinctes — 1, 2, 3, 5, 6, 7, 8 et 9
+/// pixels sur une cellule de 9. Un autre terminal les demanderait à une police
+/// de repli ; celui-ci est le seul que la ligne vise.
+///
+/// En couleur seulement : sans rainure, une jauge à 10 % ne serait qu'un trait
+/// isolé. Sous `NO_COLOR`, c'est [`BLOCS_JAUGE`] qui sert. La jauge reste
+/// réservée aux fenêtres, pour la raison donnée plus haut : le chantier l'a
+/// proposée pour le contexte, et l'utilisateur a maintenu la règle.
+pub(crate) const HUITIEMES_JAUGE: [&str; 9] = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"];
 
 /// Nombre de segments de chemin affichés avant repli en « …\feuille » —
 /// « racine\…\feuille » jusqu'au 23/09/2026.

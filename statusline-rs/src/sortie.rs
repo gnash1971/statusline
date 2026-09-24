@@ -22,9 +22,17 @@
 //! 2. **les couleurs sont réglées pour le fond du compartiment**, connu et
 //!    choisi, et plus pour un fond de thème inconnu. Le texte « plein » n'est
 //!    donc plus la couleur du terminal mais une constante, [`CODE_TEXTE`] ;
-//! 3. **le corps est neutre, c'est le palier qui colore** : le compartiment des
-//!    mesures prend le fond du pire palier qu'il porte — voir
-//!    [`teinte_du_palier`].
+//! 3. **le corps est neutre, c'est le palier qui colore** : chaque mesure prend
+//!    le fond de son propre palier — voir [`teinte_du_palier`] et
+//!    [`Fond::ParPalier`]. Jusqu'au 24/09/2026, le compartiment entier des
+//!    mesures prenait celui du pire, et un contexte à 34 % se lisait sur le
+//!    rouge d'une fenêtre épuisée.
+//!
+//! La règle 1 a **deux exceptions** depuis le 24/09/2026 — chantier
+//! « mesures » —, et deux seulement : un compartiment [`Fond::ParPalier`] pose
+//! un fond par segment, à chaque jonction ; la jauge fine pose le fond de sa
+//! rainure sur ses deux cellules, puis rend celui de son segment — voir
+//! [`jauge_selon`]. L'une et l'autre referment ce qu'elles ouvrent.
 //!
 //! Sous `NO_COLOR`, tout ce qui n'est que forme se retire — fonds, caps,
 //! jonctions, liserés, saut de ligne — et ce qui sort est, octet pour octet, la
@@ -35,9 +43,10 @@ use std::io::Write;
 
 use crate::reglages::{
     BLOCS_JAUGE, BORD_BAS, BORD_HAUT, CAP_DROIT, CAP_GAUCHE, CODE_ALERTE, CODE_ATTENUE,
-    CODE_CRITIQUE, CODE_MARQUEUR, CODE_PISTE, CODE_SEPARATEUR, CODE_TEXTE, JONCTION,
-    LARGEUR_VALEUR, LISERE, MODELE_PAR_DEFAUT, RVB_ALERTE, RVB_CONTOUR, RVB_CORPS, RVB_CRITIQUE,
-    SEPARATEUR,
+    CODE_CRITIQUE, CODE_MARQUEUR, CODE_SEPARATEUR, CODE_TEXTE, HUITIEMES_JAUGE, JONCTION,
+    LARGEUR_VALEUR, LISERE, MODELE_PAR_DEFAUT, RVB_ALERTE, RVB_CONTOUR, RVB_CONTOUR_ALERTE,
+    RVB_CONTOUR_CRITIQUE, RVB_CORPS, RVB_CRITIQUE, RVB_RAINURE_ALERTE, RVB_RAINURE_CORPS,
+    RVB_RAINURE_CRITIQUE, SEPARATEUR,
 };
 
 /// Écrit la ligne sur la sortie standard, en octets UTF-8.
@@ -127,12 +136,14 @@ pub(crate) fn palier(pourcent: i64, seuil: i64, seuil_critique: i64) -> Palier {
     }
 }
 
-/// Rend la teinte de fond du compartiment des mesures pour un palier : le
-/// corps neutre, ou l'ambre sombre, ou le rouge sombre.
+/// Rend la teinte de fond d'une mesure pour un palier : le corps neutre, ou
+/// l'ambre sombre, ou le rouge sombre.
 ///
 /// C'est la troisième règle de la capsule : un fond permanent dirait « tout va
 /// bien » ; celui-ci ne dit rien tant que rien ne s'écarte de l'ordinaire, et
-/// se teinte exactement quand les valeurs se teintent.
+/// se teinte exactement quand les valeurs se teintent. Depuis le 24/09/2026, il
+/// teinte chaque mesure et non plus le compartiment entier — voir
+/// [`Fond::ParPalier`].
 pub(crate) fn teinte_du_palier(palier: Palier) -> &'static str {
     match palier {
         Palier::Aucun => RVB_CORPS,
@@ -147,6 +158,27 @@ fn encre_du_palier(palier: Palier) -> &'static str {
         Palier::Aucun => CODE_TEXTE,
         Palier::Alerte => CODE_ALERTE,
         Palier::Critique => CODE_CRITIQUE,
+    }
+}
+
+/// Encre du contour d'une tranche de pilule selon son palier : le gris du
+/// cadre sous les seuils, l'encre même des valeurs au-delà — piste B du
+/// chantier « mesures », 24/09/2026.
+fn contour_du_palier(palier: Palier) -> &'static str {
+    match palier {
+        Palier::Aucun => RVB_CONTOUR,
+        Palier::Alerte => RVB_CONTOUR_ALERTE,
+        Palier::Critique => RVB_CONTOUR_CRITIQUE,
+    }
+}
+
+/// Fond de la rainure de la jauge fine, un ton au-dessus du fond de son
+/// segment — voir [`RVB_RAINURE_CORPS`].
+fn rainure_du_palier(palier: Palier) -> &'static str {
+    match palier {
+        Palier::Aucun => RVB_RAINURE_CORPS,
+        Palier::Alerte => RVB_RAINURE_ALERTE,
+        Palier::Critique => RVB_RAINURE_CRITIQUE,
     }
 }
 
@@ -267,30 +299,51 @@ fn bloc_jauge(pourcent: i64) -> &'static str {
     BLOCS_JAUGE[index]
 }
 
-/// Colore un cran de jauge **cellule par cellule** : le vide `░` en piste, le
-/// reste dans l'encre du palier.
+/// Rend les huitièmes des deux cellules de la jauge fine, de 0 (vide) à 8
+/// (plein), la cellule de gauche avant celle de droite.
 ///
-/// Jusqu'au 19/09/2026 le cran entier prenait la couleur du palier, si bien
-/// que sous le seuil le vide était aussi lumineux que le plein et que la
-/// densité se lisait moins qu'elle ne le pouvait. La piste ne porte pas de
-/// gras au palier critique : l'épaisseur est un signal pour un nombre, pas
-/// pour un aplat.
-fn colorer_jauge(cran: &str, palier: Palier) -> String {
-    colorer_jauge_selon(cran, palier, sans_couleur())
+/// Arrondi au plus proche — Q6 du chantier « mesures » —, avec deux bornes qui
+/// gardent la lecture honnête : un pourcentage positif montre au moins un
+/// huitième, et seul 100 % remplit les deux cellules, une jauge pleine disant
+/// le plafond atteint. Les valeurs hors bornes se rabattent sur les
+/// extrémités, comme pour [`bloc_jauge`].
+fn huitiemes_jauge(pourcent: i64) -> [usize; 2] {
+    let crans: usize = match pourcent.clamp(0, 100) {
+        0 => 0,
+        100 => 16,
+        p => ((p * 16 + 50) / 100).clamp(1, 15) as usize,
+    };
+    [crans.min(8), crans.saturating_sub(8)]
 }
 
-/// Cœur de [`colorer_jauge`], la décision de coloration passée en paramètre.
-fn colorer_jauge_selon(cran: &str, palier: Palier, sans_couleur: bool) -> String {
-    cran.chars()
-        .map(|cellule| {
-            let code = if cellule == '░' {
-                CODE_PISTE
-            } else {
-                encre_du_palier(palier)
-            };
-            colorer_selon(&cellule.to_string(), code, sans_couleur)
-        })
-        .collect()
+/// Met en forme la micro-jauge d'une fenêtre : la jauge fine en couleur, les
+/// sept crans nus de [`BLOCS_JAUGE`] sous `NO_COLOR`.
+///
+/// La jauge fine pose le fond de sa **rainure**, trace ses deux huitièmes dans
+/// l'encre du palier **de la valeur**, puis rend le fond **du segment** — qui
+/// peut être plus grave, quand une projection franchit un seuil que la valeur
+/// n'a pas atteint. C'est l'une des deux exceptions à la règle « le fond
+/// appartient au compartiment », et elle referme ce qu'elle ouvre, comme le
+/// gras ; c'est pour elle que le palier d'un segment se calcule avant sa mise
+/// en forme — Q2 du chantier.
+///
+/// Jusqu'au 24/09/2026, la jauge à sept crans se colorait cellule par cellule,
+/// le vide `░` en piste. La piste est devenue la rainure : un fond, et plus une
+/// encre. La jauge ne porte pas de gras au palier critique : l'épaisseur est un
+/// signal pour un nombre, pas pour un aplat.
+fn jauge_selon(pourcent: i64, palier: Palier, fond: Palier, sans_couleur: bool) -> String {
+    if sans_couleur {
+        return bloc_jauge(pourcent).to_string();
+    }
+    let [gauche, droite] = huitiemes_jauge(pourcent);
+    format!(
+        "\u{1b}[48;2;{}m\u{1b}[{}m{}{}\u{1b}[48;2;{}m",
+        rainure_du_palier(fond),
+        encre_du_palier(palier),
+        HUITIEMES_JAUGE[gauche],
+        HUITIEMES_JAUGE[droite],
+        teinte_du_palier(fond)
+    )
 }
 
 /// Met en forme un triplet libellé/valeur/unité : libellé et unité atténués,
@@ -315,7 +368,7 @@ pub(crate) fn formater_mesure(
 ) -> (String, Palier) {
     formater_mesure_ornee(
         libelle,
-        false,
+        None,
         valeur,
         unite,
         pourcent,
@@ -331,6 +384,11 @@ pub(crate) fn formater_mesure(
 /// C'est ce qui lui évite d'introduire un vert permanent : la ligne ne dit
 /// jamais « tout va bien », elle se tait quand tout va bien.
 ///
+/// `fond` est le palier du **segment** entier — rythme compris —, celui dont
+/// la mesure prendra le fond : la rainure de la jauge fine en dépend, et doit
+/// le rendre après ses deux cellules. Un fond moins grave que la valeur ne
+/// peut pas exister ; il est relevé à celui de la valeur par prudence.
+///
 /// Réservée aux fenêtres de limitation, pour la raison exposée en tête de
 /// [`BLOCS_JAUGE`].
 pub(crate) fn formater_mesure_jaugee(
@@ -340,10 +398,11 @@ pub(crate) fn formater_mesure_jaugee(
     pourcent: i64,
     seuil: i64,
     seuil_critique: i64,
+    fond: Palier,
 ) -> (String, Palier) {
     formater_mesure_ornee(
         libelle,
-        true,
+        Some(fond),
         valeur,
         unite,
         pourcent,
@@ -366,7 +425,7 @@ pub(crate) fn formater_mesure_jaugee(
 /// colonne où finit le compteur, pas celle où finissent ses chiffres.
 fn formater_mesure_ornee(
     libelle: &str,
-    jauger: bool,
+    jauge: Option<Palier>,
     valeur: &str,
     unite: &str,
     pourcent: i64,
@@ -378,10 +437,13 @@ fn formater_mesure_ornee(
     let largeur = valeur.chars().count() + unite.chars().count();
     let calage = " ".repeat(LARGEUR_VALEUR.saturating_sub(largeur));
 
-    let jauge = if jauger {
-        format!("{} ", colorer_jauge(bloc_jauge(pourcent), palier))
-    } else {
-        String::new()
+    // `jauge` porte le palier du segment : la jauge fine en tire sa rainure.
+    let jauge = match jauge {
+        Some(fond) => format!(
+            "{} ",
+            jauge_selon(pourcent, palier, fond.max(palier), sans_couleur())
+        ),
+        None => String::new(),
     };
 
     // Une unité vide ne produit pas une séquence de couleur vide : elle
@@ -410,8 +472,48 @@ fn formater_mesure_ornee(
 // Capsule
 // ---------------------------------------------------------------------------
 
-/// Un compartiment de la capsule : une teinte de fond, et les segments — déjà
-/// mis en forme — qu'il porte, joints par « · » à l'écriture.
+/// Un segment de compartiment : un texte déjà mis en forme, et le palier qu'il
+/// porte — le pire de ses valeurs, rythme compris.
+///
+/// Le palier ne sert qu'aux compartiments [`Fond::ParPalier`], où il décide du
+/// fond et du contour du segment ; ailleurs, il vaut [`Palier::Aucun`].
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct Segment {
+    pub(crate) texte: String,
+    pub(crate) palier: Palier,
+}
+
+impl Segment {
+    /// Un segment qui ne porte aucun palier : l'abonnement, le modèle,
+    /// l'emplacement.
+    fn neutre(texte: String) -> Self {
+        Segment {
+            texte,
+            palier: Palier::Aucun,
+        }
+    }
+}
+
+/// D'où un compartiment tient son fond.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum Fond {
+    /// Une teinte fixe — composantes `r;g;b`, sans le préfixe SGR —, posée une
+    /// fois pour tout le compartiment : la tête, l'identité, l'emplacement.
+    Fixe(&'static str),
+    /// La teinte du palier de **chaque segment** : les mesures, depuis le
+    /// 24/09/2026 — chantier « mesures », piste A, Q1.
+    ///
+    /// En couleur, un tel compartiment s'affiche éclaté : chaque segment prend
+    /// le fond et le contour de son palier, et deux segments se joignent par un
+    /// arc au lieu du « · ». La jonction — liseré, arc, liseré — fait trois
+    /// cellules comme le point et ses deux blancs : la largeur du compartiment
+    /// ne change pas, et [`empaqueter`] coupe aux mêmes endroits. Sous
+    /// `NO_COLOR`, il reste un compartiment comme un autre, joint par le point.
+    ParPalier,
+}
+
+/// Un compartiment de la capsule : un fond, et les segments — déjà mis en
+/// forme — qu'il porte, joints par « · » à l'écriture.
 ///
 /// Un compartiment **est** un groupe de la ligne d'avant : le régime, ce qui
 /// tourne, où l'on est, ce que la session consomme. Un compartiment sans
@@ -422,23 +524,37 @@ fn formater_mesure_ornee(
 /// quand un compartiment seul déborde encore, entre ses segments. Voir
 /// [`empaqueter`].
 pub(crate) struct Compartiment {
-    /// Composantes `r;g;b` de la teinte, sans le préfixe SGR : la même sert de
-    /// fond au compartiment et d'encre aux caps qui le bordent.
-    pub(crate) teinte: &'static str,
+    pub(crate) fond: Fond,
     /// Segments non vides, dans l'ordre de la ligne.
-    pub(crate) segments: Vec<String>,
+    pub(crate) segments: Vec<Segment>,
 }
 
 impl Compartiment {
-    /// Construit un compartiment à partir de segments optionnels : les absents
-    /// et les vides se retirent, le compartiment aussi s'il n'en reste aucun.
+    /// Construit un compartiment de teinte fixe à partir de segments
+    /// optionnels : les absents et les vides se retirent, le compartiment
+    /// aussi s'il n'en reste aucun.
     pub(crate) fn nouveau(teinte: &'static str, segments: Vec<Option<String>>) -> Self {
         Compartiment {
-            teinte,
+            fond: Fond::Fixe(teinte),
             segments: segments
                 .into_iter()
                 .flatten()
                 .filter(|s| !s.is_empty())
+                .map(Segment::neutre)
+                .collect(),
+        }
+    }
+
+    /// Construit le compartiment des mesures, un fond par segment selon son
+    /// palier — voir [`Fond::ParPalier`] ; les absents et les vides se
+    /// retirent comme dans [`Compartiment::nouveau`].
+    pub(crate) fn mesures(segments: Vec<Option<Segment>>) -> Self {
+        Compartiment {
+            fond: Fond::ParPalier,
+            segments: segments
+                .into_iter()
+                .flatten()
+                .filter(|s| !s.texte.is_empty())
                 .collect(),
         }
     }
@@ -451,12 +567,81 @@ impl Compartiment {
     /// segment — c'est la jointure que `joindre_groupes` faisait au rang du
     /// groupe, avant la capsule.
     fn texte(&self) -> String {
-        self.segments.join(&separateur())
+        self.segments
+            .iter()
+            .map(|s| s.texte.as_str())
+            .collect::<Vec<_>>()
+            .join(&separateur())
+    }
+
+    /// Tranches du compartiment, telles qu'[`encapsuler`] les pose entre deux
+    /// jonctions : une seule pour un fond fixe, une par segment pour un fond au
+    /// palier.
+    fn tranches(&self) -> Vec<Tranche> {
+        match self.fond {
+            Fond::Fixe(teinte) => vec![Tranche {
+                teinte,
+                palier: Palier::Aucun,
+                texte: self.texte(),
+            }],
+            Fond::ParPalier => self
+                .segments
+                .iter()
+                .map(|s| Tranche {
+                    teinte: teinte_du_palier(s.palier),
+                    palier: s.palier,
+                    texte: s.texte.clone(),
+                })
+                .collect(),
+        }
     }
 
     /// Largeur du compartiment à l'écran, liserés non compris.
     fn largeur(&self) -> usize {
         largeur_visible(&self.texte())
+    }
+}
+
+/// Une tranche de pilule : ce qu'[`encapsuler`] pose entre deux jonctions — un
+/// fond, le palier qui choisit son contour, un texte.
+struct Tranche {
+    teinte: &'static str,
+    palier: Palier,
+    texte: String,
+}
+
+/// Un bord du cadre en cours d'écriture : le glyphe répété, et l'encre
+/// courante, pour ne poser une séquence qu'aux changements d'encre.
+struct Bord {
+    texte: String,
+    glyphe: &'static str,
+    encre: &'static str,
+}
+
+impl Bord {
+    /// Ouvre un bord par la séquence d'encre, **puis** le blanc qui saute le
+    /// cap gauche : Claude Code rogne chaque ligne, et un blanc en tête
+    /// décalerait le bord d'une colonne.
+    fn ouvrir(glyphe: &'static str, encre: &'static str) -> Self {
+        Bord {
+            texte: format!("\u{1b}[38;2;{encre}m "),
+            glyphe,
+            encre,
+        }
+    }
+
+    /// Pose `cellules` glyphes dans `encre`.
+    fn poser(&mut self, encre: &'static str, cellules: usize) {
+        if encre != self.encre {
+            self.texte.push_str(&format!("\u{1b}[38;2;{encre}m"));
+            self.encre = encre;
+        }
+        self.texte.push_str(&self.glyphe.repeat(cellules));
+    }
+
+    fn fermer(mut self) -> String {
+        self.texte.push_str("\u{1b}[0m");
+        self.texte
     }
 }
 
@@ -550,15 +735,15 @@ fn empaqueter(rangees: Vec<Vec<Compartiment>>, capacite: Option<usize>) -> Vec<V
                 continue;
             }
             // Segment par segment : on remplit ce qui reste, puis on continue
-            // dans la capsule suivante, sous la même teinte.
-            let teinte = compartiment.teinte;
+            // dans la capsule suivante, sous le même fond.
+            let fond = compartiment.fond;
             let mut partiel = Compartiment {
-                teinte,
+                fond,
                 segments: Vec::new(),
             };
             for segment in compartiment.segments {
                 let mut essai = Compartiment {
-                    teinte,
+                    fond,
                     segments: partiel.segments.clone(),
                 };
                 essai.segments.push(segment.clone());
@@ -574,7 +759,7 @@ fn empaqueter(rangees: Vec<Vec<Compartiment>>, capacite: Option<usize>) -> Vec<V
                 }
                 // Même trop large pour une capsule vide : il part seul.
                 partiel = Compartiment {
-                    teinte,
+                    fond,
                     segments: vec![segment],
                 };
             }
@@ -621,6 +806,16 @@ fn empaqueter(rangees: Vec<Vec<Compartiment>>, capacite: Option<usize>) -> Vec<V
 /// chantier : une géométrie constante vaut mieux qu'une colonne gagnée dans un
 /// cas rare — et, depuis que l'arc a son encre, elle n'y est plus invisible.
 ///
+/// **Depuis le 24/09/2026** — chantier « mesures », pistes A et B —, la pilule
+/// se pose par **tranches** plutôt que par compartiments : un compartiment
+/// [`Fond::ParPalier`] en donne une par segment, chacune sur le fond de son
+/// palier et jointe à la suivante par un arc. L'encre du contour n'est plus
+/// une : [`RVB_CONTOUR`] sous les seuils, l'encre des valeurs au-delà. Chaque
+/// tronçon de bord prend l'encre de sa tranche, une jonction et ses deux
+/// cellules de bord celle du pire des deux voisins, chaque cap celle de la
+/// tranche qu'il ferme. Sans palier franchi, la séquence est exactement celle
+/// d'avant, octet pour octet.
+///
 /// Sous `NO_COLOR`, les textes joints par un espace : la forme se retire, le
 /// contenu reste — c'était déjà la frontière tenue par les pastilles.
 ///
@@ -641,30 +836,41 @@ fn encapsuler(compartiments: &[Compartiment], sans_couleur: bool) -> String {
             .join(" ");
     }
 
-    let mut ligne = format!("\u{1b}[38;2;{RVB_CONTOUR}m{CAP_GAUCHE}");
-    for (rang, compartiment) in pleins.iter().enumerate() {
-        ligne.push_str(&format!("\u{1b}[48;2;{}m", compartiment.teinte));
+    let tranches: Vec<Tranche> = pleins.iter().flat_map(|c| c.tranches()).collect();
+    let premier = contour_du_palier(tranches[0].palier);
+    let dernier = contour_du_palier(tranches[tranches.len() - 1].palier);
+
+    // Les bords courent entre les deux caps, le cap gauche sauté par un blanc ;
+    // ils s'écrivent tranche par tranche, chacune dans l'encre de son contour.
+    let mut haut = Bord::ouvrir(BORD_HAUT, premier);
+    let mut bas = Bord::ouvrir(BORD_BAS, premier);
+
+    let mut ligne = format!("\u{1b}[38;2;{premier}m{CAP_GAUCHE}");
+    for (rang, tranche) in tranches.iter().enumerate() {
+        ligne.push_str(&format!("\u{1b}[48;2;{}m", tranche.teinte));
         if rang > 0 {
-            ligne.push_str(&format!("\u{1b}[38;2;{RVB_CONTOUR}m{JONCTION}"));
+            // L'arc ferme la tranche de gauche, mais une mesure grave bordée
+            // d'un arc gris paraîtrait ouverte : il prend l'encre du pire des
+            // deux voisins — Q3 du chantier « mesures ».
+            let jonction = contour_du_palier(tranches[rang - 1].palier.max(tranche.palier));
+            ligne.push_str(&format!("\u{1b}[38;2;{jonction}m{JONCTION}"));
+            haut.poser(jonction, 1);
+            bas.poser(jonction, 1);
         }
         ligne.push_str(LISERE);
-        ligne.push_str(&compartiment.texte());
+        ligne.push_str(&tranche.texte);
         ligne.push_str(LISERE);
+
+        let contour = contour_du_palier(tranche.palier);
+        let cellules = largeur_visible(&tranche.texte) + 2;
+        haut.poser(contour, cellules);
+        bas.poser(contour, cellules);
     }
     ligne.push_str(&format!(
-        "\u{1b}[0m\u{1b}[38;2;{RVB_CONTOUR}m{CAP_DROIT}\u{1b}[0m"
+        "\u{1b}[0m\u{1b}[38;2;{dernier}m{CAP_DROIT}\u{1b}[0m"
     ));
 
-    // Les bords courent entre les deux caps : la largeur de la capsule moins
-    // ses deux extrémités, le cap gauche sauté par un blanc.
-    let interieur = largeur_capsule(&pleins) - 2;
-    let bord = |glyphe: &str| {
-        format!(
-            "\u{1b}[38;2;{RVB_CONTOUR}m {}\u{1b}[0m",
-            glyphe.repeat(interieur)
-        )
-    };
-    format!("{}\n{ligne}\n{}", bord(BORD_HAUT), bord(BORD_BAS))
+    format!("{}\n{ligne}\n{}", haut.fermer(), bas.fermer())
 }
 
 /// Assemble la sortie : les rangées prévues, repliées à la capacité du
@@ -811,6 +1017,11 @@ mod tests {
     /// absents de Consolas, et le terminal les faisait dessiner par une police
     /// de repli, à une autre graisse. Les blocs partiels `▏▎▍▌▋▊▉`, qui
     /// donneraient seize crans, en sont absents tout autant.
+    ///
+    /// Depuis le 24/09/2026, cette table ne sert plus que sous `NO_COLOR`, et
+    /// le test la garde telle : en couleur, la jauge fine emploie justement ces
+    /// blocs partiels, que Windows Terminal trace lui-même — voir
+    /// `les_huitiemes_sont_des_elements_de_bloc`.
     #[test]
     fn les_crans_de_jauge_sont_dans_consolas() {
         // Sous-ensemble de « Block Elements » que Consolas possède réellement,
@@ -832,28 +1043,90 @@ mod tests {
         }
     }
 
-    /// Le vide de la jauge est en piste, le plein dans l'encre du palier, et
-    /// chaque cellule porte sa propre séquence.
+    /// Seize huitièmes sur deux cellules, la gauche avant la droite ; au moins
+    /// un dès 1 %, les deux pleines à 100 % seulement.
     #[test]
-    fn la_jauge_se_colore_cellule_par_cellule() {
+    fn jauge_fine_monte_par_seiziemes() {
+        assert_eq!(huitiemes_jauge(0), [0, 0]);
+        assert_eq!(huitiemes_jauge(1), [1, 0]);
+        assert_eq!(huitiemes_jauge(3), [1, 0]);
+        assert_eq!(huitiemes_jauge(10), [2, 0]);
+        assert_eq!(huitiemes_jauge(20), [3, 0]);
+        assert_eq!(huitiemes_jauge(50), [8, 0]);
+        assert_eq!(huitiemes_jauge(56), [8, 1]);
+        assert_eq!(huitiemes_jauge(94), [8, 7]);
+        // 97 % s'arrondirait au plein : une jauge pleine dirait le plafond
+        // atteint, elle attend donc les 100 %.
+        assert_eq!(huitiemes_jauge(97), [8, 7]);
+        assert_eq!(huitiemes_jauge(100), [8, 8]);
+        // Hors bornes : les extrémités, jamais d'indexation hors table.
+        assert_eq!(huitiemes_jauge(-30), [0, 0]);
+        assert_eq!(huitiemes_jauge(150), [8, 8]);
+        // Monotone, et jamais la droite avant que la gauche ne soit pleine.
+        let mut precedent = [0, 0];
+        for pourcent in 0..=100 {
+            let [gauche, droite] = huitiemes_jauge(pourcent);
+            assert!(droite == 0 || gauche == 8, "{pourcent} %");
+            assert!([gauche, droite] >= precedent, "{pourcent} %");
+            precedent = [gauche, droite];
+        }
+    }
+
+    /// Les huitièmes sont des éléments de bloc, que Windows Terminal trace
+    /// lui-même — relevé au pixel le 24/09/2026 : ils ne sont pas dans
+    /// Consolas, et c'est pourquoi ils ne servent qu'en couleur. Le premier est
+    /// le blanc de la cellule vide, qui laisse voir la rainure.
+    #[test]
+    fn les_huitiemes_sont_des_elements_de_bloc() {
+        assert_eq!(HUITIEMES_JAUGE[0], " ");
+        for (rang, huitieme) in HUITIEMES_JAUGE.iter().enumerate().skip(1) {
+            let mut glyphes = huitieme.chars();
+            let glyphe = glyphes.next().expect("un glyphe");
+            assert_eq!(glyphes.next(), None, "un huitième fait une cellule");
+            assert!(
+                ('\u{2580}'..='\u{259F}').contains(&glyphe),
+                "le huitième {rang} ({glyphe:?}) n'est pas un élément de bloc"
+            );
+        }
+        // Du plus étroit au plus large : `▏` (U+258F) descend jusqu'à `█`
+        // (U+2588), un point de code par huitième.
+        for rang in 1..8 {
+            let point = |r: usize| HUITIEMES_JAUGE[r].chars().next().map(u32::from);
+            assert_eq!(point(rang + 1), point(rang).map(|p| p - 1));
+        }
+    }
+
+    /// La jauge fine pose sa rainure, trace ses deux huitièmes dans l'encre de
+    /// la valeur, puis rend le fond du segment — sans gras, même au critique ;
+    /// sous `NO_COLOR`, les sept crans nus.
+    #[test]
+    fn la_rainure_rend_le_fond_de_son_segment() {
         assert_eq!(
-            colorer_jauge_selon("▒░", Palier::Aucun, false),
-            format!("{ESC}[{CODE_TEXTE}m▒{ESC}[{CODE_PISTE}m░")
+            jauge_selon(20, Palier::Aucun, Palier::Aucun, false),
+            format!("{ESC}[48;2;{RVB_RAINURE_CORPS}m{ESC}[{CODE_TEXTE}m▍ {ESC}[48;2;{RVB_CORPS}m")
         );
+        // Une valeur calme dans un segment en alerte — sa projection a franchi
+        // le seuil : l'encre de la valeur, la rainure et le fond du segment.
         assert_eq!(
-            colorer_jauge_selon("█▓", Palier::Alerte, false),
-            format!("{ESC}[{CODE_ALERTE}m█{ESC}[{CODE_ALERTE}m▓")
+            jauge_selon(40, Palier::Aucun, Palier::Alerte, false),
+            format!(
+                "{ESC}[48;2;{RVB_RAINURE_ALERTE}m{ESC}[{CODE_TEXTE}m▊ {ESC}[48;2;{RVB_ALERTE}m"
+            )
         );
-        // Au palier critique, l'encre corail sans gras : l'épaisseur est un
-        // signal pour un nombre, pas pour un aplat.
-        let critique = colorer_jauge_selon("██", Palier::Critique, false);
+        let critique = jauge_selon(100, Palier::Critique, Palier::Critique, false);
         assert_eq!(
             critique,
-            format!("{ESC}[{CODE_CRITIQUE}m█{ESC}[{CODE_CRITIQUE}m█")
+            format!(
+                "{ESC}[48;2;{RVB_RAINURE_CRITIQUE}m{ESC}[{CODE_CRITIQUE}m██{ESC}[48;2;{RVB_CRITIQUE}m"
+            )
         );
-        assert!(!critique.contains("[1m"));
-        // Sous NO_COLOR, le cran nu.
-        assert_eq!(colorer_jauge_selon("▒░", Palier::Aucun, true), "▒░");
+        assert!(!critique.contains("[1m") && !critique.contains("[0m"));
+        assert_eq!(largeur_visible(&critique), 2);
+        assert_eq!(jauge_selon(20, Palier::Aucun, Palier::Aucun, true), "▒░");
+        assert_eq!(
+            jauge_selon(100, Palier::Critique, Palier::Critique, true),
+            "██"
+        );
     }
 
     #[test]
@@ -861,17 +1134,29 @@ mod tests {
         // Les attendus passent par les mêmes briques que la mise en forme :
         // les deux côtés suivent ainsi la même décision `NO_COLOR`, que Claude
         // Code définit dans l'environnement de `cargo test`.
-        let (jaugee, palier_jaugee) = formater_mesure_jaugee("5h", "20", "%", 20, 80, 90);
+        let (jaugee, palier_jaugee) =
+            formater_mesure_jaugee("5h", "20", "%", 20, 80, 90, Palier::Aucun);
         assert_eq!(
             jaugee,
             format!(
                 "{} {} {}{}",
                 attenuer("5h"),
-                colorer_jauge("▒░", Palier::Aucun),
+                jauge_selon(20, Palier::Aucun, Palier::Aucun, sans_couleur()),
                 texte_plein("20"),
                 attenuer("%")
             )
         );
+        assert_eq!(palier_jaugee, Palier::Aucun);
+        // Le fond du segment va à la rainure ; il ne change pas le palier de
+        // la valeur, que la mesure remonte.
+        let (jaugee, palier_jaugee) =
+            formater_mesure_jaugee("5h", "40", "%", 40, 80, 90, Palier::Alerte);
+        assert!(jaugee.contains(&jauge_selon(
+            40,
+            Palier::Aucun,
+            Palier::Alerte,
+            sans_couleur()
+        )));
         assert_eq!(palier_jaugee, Palier::Aucun);
 
         // Le contexte, lui, garde la forme d'origine.
@@ -902,7 +1187,7 @@ mod tests {
     /// palier critique, l'unité le gris, et la mesure remonte son palier.
     #[test]
     fn l_unite_reste_hors_de_la_couleur_du_palier() {
-        let (mesure, palier) = formater_mesure_ornee("ctx", false, "93", "%", 93, 80, 90);
+        let (mesure, palier) = formater_mesure_ornee("ctx", None, "93", "%", 93, 80, 90);
 
         assert!(mesure.contains(&au_palier("93", Palier::Critique)));
         assert!(mesure.ends_with(&attenuer("%")));
@@ -1330,7 +1615,10 @@ mod tests {
                 vec!["7j █░ 45%".to_string()],
             ]
         );
-        assert!(rangs.iter().flatten().all(|c| c.teinte == RVB_ALERTE));
+        assert!(rangs
+            .iter()
+            .flatten()
+            .all(|c| c.fond == Fond::Fixe(RVB_ALERTE)));
         // À 20 : chaque segment seul ; le second, à 21 + 4 = 25, déborde et
         // part quand même seul — il s'enroulera, il n'y a plus rien à faire.
         assert_eq!(
@@ -1363,8 +1651,8 @@ mod tests {
             ]
         );
         // Les morceaux gardent la teinte du compartiment d'origine.
-        assert_eq!(rangs[0][1].teinte, RVB_CORPS);
-        assert_eq!(rangs[1][0].teinte, RVB_CORPS);
+        assert_eq!(rangs[0][1].fond, Fond::Fixe(RVB_CORPS));
+        assert_eq!(rangs[1][0].fond, Fond::Fixe(RVB_CORPS));
     }
 
     /// Les rangées prévues ne se mélangent jamais : les mesures ne remontent
@@ -1403,5 +1691,180 @@ mod tests {
             sortie,
             format!("Pro v2.1.259{}Opus 5 ctx 34%", separateur())
         );
+    }
+
+    // -----------------------------------------------------------------------
+    // Mesure par mesure — chantier « mesures », 24/09/2026
+    // -----------------------------------------------------------------------
+
+    /// Un segment de mesure, tel que les producteurs le rendent.
+    fn segment(texte: &str, palier: Palier) -> Option<Segment> {
+        Some(Segment {
+            texte: texte.to_string(),
+            palier,
+        })
+    }
+
+    /// Éclaté ou non, le compartiment des mesures a la même largeur : la
+    /// jonction — liseré, arc, liseré — fait trois cellules comme le point et
+    /// ses deux blancs. Le repli coupe donc aux mêmes endroits (piste A, Q1).
+    #[test]
+    fn eclater_ne_change_pas_la_largeur() {
+        let mesures = ["ctx 34%", "5h ▒░ 20% → 41% 15:00", "7j █░ 45%"];
+        let eclate = || {
+            vec![vec![
+                compartiment(RVB_TETE, "Pro"),
+                Compartiment::mesures(vec![
+                    segment(mesures[0], Palier::Aucun),
+                    segment(mesures[1], Palier::Critique),
+                    segment(mesures[2], Palier::Alerte),
+                ]),
+            ]]
+        };
+        let fixe = || {
+            vec![vec![
+                compartiment(RVB_TETE, "Pro"),
+                compartiment_segments(RVB_CORPS, &mesures),
+            ]]
+        };
+
+        // La pilule éclatée mesure ce que `largeur_capsule` annonce, et ses
+        // bords courent sur la même largeur, moins les caps.
+        let rangee = eclate();
+        let capsule = encapsuler(&rangee[0], false);
+        let rangs: Vec<&str> = capsule.split('\n').collect();
+        assert_eq!(
+            largeur_visible(rangs[1]),
+            largeur_capsule(&rangee[0].iter().collect::<Vec<_>>())
+        );
+        assert_eq!(largeur_visible(rangs[0]), largeur_visible(rangs[1]) - 1);
+        assert_eq!(largeur_visible(rangs[2]), largeur_visible(rangs[1]) - 1);
+
+        for capacite in [None, Some(120), Some(40), Some(30), Some(20)] {
+            assert_eq!(
+                textes(&empaqueter(eclate(), capacite)),
+                textes(&empaqueter(fixe(), capacite)),
+                "{capacite:?}"
+            );
+        }
+        // Les morceaux d'un compartiment coupé gardent son fond au palier.
+        assert!(empaqueter(eclate(), Some(20))
+            .iter()
+            .flatten()
+            .skip(1)
+            .all(|c| c.fond == Fond::ParPalier));
+    }
+
+    /// Sous `NO_COLOR`, les mesures restent jointes par le point, les absents
+    /// retirés : la ligne du harnais ne bouge pas d'un octet.
+    #[test]
+    fn sous_no_color_les_mesures_restent_jointes_par_le_point() {
+        let rangees = vec![vec![
+            compartiment(RVB_TETE, "Pro"),
+            Compartiment::mesures(vec![
+                segment("ctx 93%", Palier::Critique),
+                None,
+                segment("", Palier::Alerte),
+                segment("5h ▒░ 20%", Palier::Aucun),
+            ]),
+        ]];
+        assert_eq!(
+            assembler_capsules_selon(rangees, Some(10), true),
+            format!("Pro ctx 93%{}5h ▒░ 20%", separateur())
+        );
+        assert!(Compartiment::mesures(vec![None, segment("", Palier::Critique)]).est_vide());
+    }
+
+    /// Chaque mesure prend le fond et le contour de son palier ; l'arc entre
+    /// deux mesures prend l'encre de la plus grave (Q3), le cap droit celle de
+    /// la dernière, et chaque tronçon de bord celle de sa tranche.
+    #[test]
+    fn chaque_mesure_prend_le_fond_et_le_contour_de_son_palier() {
+        let capsule = encapsuler(
+            &[
+                compartiment(RVB_LIEU, "src"),
+                Compartiment::mesures(vec![
+                    segment("ctx 34%", Palier::Aucun),
+                    segment("5h 40%", Palier::Critique),
+                    segment("7j 78%", Palier::Alerte),
+                ]),
+            ],
+            false,
+        );
+        let rangs: Vec<&str> = capsule.split('\n').collect();
+        assert_eq!(rangs.len(), 3, "{capsule:?}");
+        let pilule = rangs[1];
+
+        // Toujours deux remises à zéro, autour du cap droit, à l'encre de la
+        // dernière mesure.
+        assert_eq!(pilule.matches(&format!("{ESC}[0m")).count(), 2);
+        assert!(pilule.ends_with(&format!(
+            "{ESC}[0m{ESC}[38;2;{RVB_CONTOUR_ALERTE}m{CAP_DROIT}{ESC}[0m"
+        )));
+        // Le contexte, calme, sur l'ardoise, joint à l'emplacement par un arc
+        // gris.
+        assert!(pilule.contains(&format!(
+            "{ESC}[48;2;{RVB_CORPS}m{ESC}[38;2;{RVB_CONTOUR}m{JONCTION}{LISERE}ctx 34%{LISERE}"
+        )));
+        // La fenêtre critique sur le rouge sombre, l'arc qui la précède au
+        // corail ; entre critique et alerte, corail encore.
+        assert!(pilule.contains(&format!(
+            "{ESC}[48;2;{RVB_CRITIQUE}m{ESC}[38;2;{RVB_CONTOUR_CRITIQUE}m{JONCTION}{LISERE}5h 40%{LISERE}"
+        )));
+        assert!(pilule.contains(&format!(
+            "{ESC}[48;2;{RVB_ALERTE}m{ESC}[38;2;{RVB_CONTOUR_CRITIQUE}m{JONCTION}{LISERE}7j 78%{LISERE}"
+        )));
+        assert_eq!(pilule.matches(&format!("{ESC}[48;2;")).count(), 4);
+
+        // Le bord haut : gris sur l'emplacement, sa jonction et le contexte ;
+        // corail de l'arc qui précède la fenêtre critique à celui qui la suit ;
+        // ambre sur la dernière. Une séquence à chaque changement d'encre.
+        assert_eq!(
+            rangs[0],
+            format!(
+                "{ESC}[38;2;{RVB_CONTOUR}m {}{ESC}[38;2;{RVB_CONTOUR_CRITIQUE}m{}{ESC}[38;2;{RVB_CONTOUR_ALERTE}m{}{ESC}[0m",
+                BORD_HAUT.repeat((3 + 2) + 1 + (7 + 2)),
+                BORD_HAUT.repeat(1 + (6 + 2) + 1),
+                BORD_HAUT.repeat(6 + 2)
+            )
+        );
+        assert_eq!(
+            rangs[2],
+            rangs[0].replace(BORD_HAUT, BORD_BAS),
+            "le bord bas suit le haut"
+        );
+    }
+
+    /// Un bord s'ouvre par la séquence d'encre, jamais par le blanc — même
+    /// quand la première tranche est au palier critique : Claude Code rogne
+    /// chaque ligne, et un blanc en tête décalerait le bord d'une colonne.
+    #[test]
+    fn les_bords_s_ouvrent_par_l_encre_avant_le_blanc() {
+        let capsule = encapsuler(
+            &[Compartiment::mesures(vec![segment(
+                "ctx 93%",
+                Palier::Critique,
+            )])],
+            false,
+        );
+        let rangs: Vec<&str> = capsule.split('\n').collect();
+        let ouverture = format!("{ESC}[38;2;{RVB_CONTOUR_CRITIQUE}m ");
+        assert!(
+            rangs[0].starts_with(&ouverture) && rangs[2].starts_with(&ouverture),
+            "{capsule:?}"
+        );
+        assert!(rangs[1].starts_with(&format!(
+            "{ESC}[38;2;{RVB_CONTOUR_CRITIQUE}m{CAP_GAUCHE}{ESC}[48;2;{RVB_CRITIQUE}m{LISERE}ctx 93%"
+        )));
+    }
+
+    /// Les encres de contour d'alerte et critique sont celles des valeurs : un
+    /// réaccord de l'une sans l'autre séparerait le cadre de ce qu'il signale.
+    #[test]
+    fn les_contours_de_palier_sont_les_encres_des_valeurs() {
+        assert_eq!(format!("38;2;{RVB_CONTOUR_ALERTE}"), CODE_ALERTE);
+        assert_eq!(format!("38;2;{RVB_CONTOUR_CRITIQUE}"), CODE_CRITIQUE);
+        assert_eq!(contour_du_palier(Palier::Aucun), RVB_CONTOUR);
+        assert_eq!(rainure_du_palier(Palier::Aucun), RVB_RAINURE_CORPS);
     }
 }

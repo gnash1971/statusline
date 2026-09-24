@@ -22,7 +22,7 @@ use crate::reglages::{
     LIBELLE_MODE_RAPIDE, LIBELLE_SANS_REFLEXION, PROFONDEUR_MAX_CHEMIN, SEUIL_CONTEXTE,
     SEUIL_CRITIQUE_CONTEXTE, UNITE_POURCENT,
 };
-use crate::sortie::{attenuer, colorer, formater_mesure, marquer, texte_plein, Palier};
+use crate::sortie::{attenuer, colorer, formater_mesure, marquer, texte_plein, Segment};
 
 /// Replie une suite de segments de chemin en « …\feuille » au-delà de la
 /// profondeur maximale, pour ne pas manger la ligne.
@@ -351,12 +351,17 @@ pub(crate) fn segment_modele(donnees: &Value, modele: &str) -> String {
 }
 
 /// Produit le segment d'occupation du contexte, avec le palier qu'il atteint —
-/// l'assemblage en teinte le compartiment des mesures.
+/// celui de son fond et de son contour dans la capsule, depuis le 24/09/2026.
 ///
 /// `used_percentage` est nul avant le premier appel API, et de nouveau après un
 /// /compact tant que rien n'a été renvoyé : le segment disparaît alors, plutôt
 /// que d'afficher un « ctx 0% » qui se lirait comme une mesure.
-pub(crate) fn segment_contexte(donnees: &Value) -> Option<(String, Palier)> {
+///
+/// Sans jauge, en couleur comme sous `NO_COLOR` : le contexte se compacte, il
+/// ne se remplit pas vers un plafond qu'on subit — voir `BLOCS_JAUGE` dans
+/// [`crate::reglages`]. Le chantier « mesures » l'a proposée, l'utilisateur a
+/// maintenu la règle.
+pub(crate) fn segment_contexte(donnees: &Value) -> Option<Segment> {
     let contexte = champ(donnees, "context_window");
     if contexte.is_null() {
         return None;
@@ -364,14 +369,15 @@ pub(crate) fn segment_contexte(donnees: &Value) -> Option<(String, Palier)> {
 
     let pourcent = convertir_pourcent(champ(contexte, "used_percentage"))?;
 
-    Some(formater_mesure(
+    let (texte, palier) = formater_mesure(
         "ctx",
         &pourcent.to_string(),
         UNITE_POURCENT,
         pourcent,
         SEUIL_CONTEXTE,
         SEUIL_CRITIQUE_CONTEXTE,
-    ))
+    );
+    Some(Segment { texte, palier })
 }
 
 #[cfg(test)]
@@ -451,21 +457,31 @@ mod tests {
             .contains("[48;"));
     }
 
-    /// Le contexte remonte son palier avec sa mise en forme.
+    /// Le contexte remonte son palier avec sa mise en forme — et ne porte
+    /// aucune jauge, ni fine ni à sept crans, en couleur comme sans.
     #[test]
     fn le_contexte_remonte_son_palier() {
+        use crate::sortie::Palier;
+
         let a = |p: i64| json!({ "context_window": { "used_percentage": p } });
         assert_eq!(
-            segment_contexte(&a(34)).map(|(_, p)| p),
+            segment_contexte(&a(34)).map(|s| s.palier),
             Some(Palier::Aucun)
         );
         assert_eq!(
-            segment_contexte(&a(80)).map(|(_, p)| p),
+            segment_contexte(&a(80)).map(|s| s.palier),
             Some(Palier::Alerte)
         );
         assert_eq!(
-            segment_contexte(&a(92)).map(|(_, p)| p),
+            segment_contexte(&a(92)).map(|s| s.palier),
             Some(Palier::Critique)
+        );
+        let texte = segment_contexte(&a(50))
+            .map(|s| s.texte)
+            .unwrap_or_default();
+        assert!(
+            !texte.contains("[48;2;") && !texte.contains('█') && !texte.contains('░'),
+            "{texte:?}"
         );
         // Sans mesure, pas de segment — et donc pas de palier à remonter.
         assert!(segment_contexte(&json!({ "context_window": {} })).is_none());

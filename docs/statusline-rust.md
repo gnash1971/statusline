@@ -2108,3 +2108,141 @@ Elles passent de 120 / 90 / 60 à **120 / 70 / 40** — un rang, coupe entre
 compartiments, coupe entre segments —, `largeur-90.svg` et `largeur-60.svg`
 laissant place à `largeur-70.svg` et `largeur-40.svg`. Figures régénérées,
 copie préalable du dossier dans `.backups\20260923-160332_avant-docs-depot\`.
+
+## 26. Les mesures une à une — 24/09/2026
+
+La question était ouverte — « peut-on encore améliorer le rendu ? » — et la
+réponse a pris la forme d'un canevas de sept planches, chaque ligne dessinée
+cellule par cellule aux teintes exactes du crate : la capsule telle qu'elle
+était, cinq pistes, une recommandation. **A**, un palier par mesure ; **B**, un
+cadre qui porte l'alerte ; **C**, une jauge fine ; **D**, l'effort en escalier ;
+**E**, moins de rangs. L'utilisateur a retenu A + B + C ; D et E restent notées.
+Le lot a été rédigé avant toute ligne de code, `.claude\CHANTIER-statusline-mesures.md`,
+et ses questions tranchées une à une sur la capture d'un script de comparaison
+collé dans Windows Terminal.
+
+### Ce que la capsule taisait
+
+Le compartiment des mesures prenait le fond du **pire** palier qu'il portait.
+Une fenêtre de 5 heures épuisée mettait donc au rouge un contexte à 34 % et une
+semaine à 45 % : le fond disait qu'il fallait lever le pied, pas de quoi. Depuis
+la 2.4.0, chaque mesure prend le fond de son propre palier (A), et son cadre —
+les deux bords qui la coiffent, l'arc qui la ferme — l'encre de ses valeurs
+(B) : l'alerte se voit du coin de l'œil, et elle se voit **là où elle est**.
+
+### Deux invariants, tenus par construction
+
+Le compartiment des mesures reste **un** compartiment, de fond
+`Fond::ParPalier` : en couleur, `encapsuler` le pose tranche par tranche, un
+segment par tranche, jointes par un arc ; sous `NO_COLOR`, il est un
+compartiment comme un autre, joint par le point. Deux conséquences, qu'aucun
+code n'a eu à garantir :
+
+- **la largeur ne change pas** : le point et ses deux blancs font trois
+  cellules, le liseré, l'arc et le liseré aussi. `largeur_capsule` et
+  `empaqueter` n'ont pas su qu'un compartiment s'éclatait, et le repli coupe
+  aux mêmes endroits — `eclater_ne_change_pas_la_largeur` le vérifie à 120,
+  40, 30 et 20 colonnes ;
+- **la ligne `NO_COLOR` ne change pas d'un octet** : l'oracle n'a pas été
+  dégelé, et le harnais n'a rien eu à apprendre.
+
+L'autre voie — trois compartiments distincts — aurait demandé une règle de
+plus sous `NO_COLOR` (les joindre par le point, et non par l'espace des
+compartiments) et une notion de groupe dans l'assemblage.
+
+### La jauge fine, et ce que l'écran a démenti
+
+Le §13 tenait la jauge à seize crans pour hors d'atteinte sans changer de
+police : les blocs partiels `▏▎▍▌▋▊▉` sont absents de Consolas, et le 25/08 les
+blocs de hauteur, absents de même, sortaient d'une police de repli. Mais le
+§23 a appris depuis que Windows Terminal trace lui-même les caps Powerline.
+Le préalable du chantier a posé la question pour les huitièmes, et la capture,
+relevée au pixel, a répondu : **1, 2, 3, 5, 6, 7, 8 et 9 pixels** sur une cellule
+de 9, huit largeurs distinctes, tracées par le terminal.
+
+La jauge des fenêtres compte donc seize crans sur ses deux mêmes cellules, un
+tous les 6,25 points. Le vide n'est plus un `░` gris mais une **rainure** : le
+fond des deux cellules, un ton au-dessus de celui de la mesure. Trois variantes
+ont été montrées — rainure sombre, claire, aucune. La capture a appris que
+le fond du terminal sous l'acrylique varie d'une ligne à l'autre (de
+`37,37,36` à `56,53,49` sur la même image) et que la rainure sombre
+(`41;45;52`) en prenait presque la teinte : elle se lisait comme une fente dans
+la capsule. L'utilisateur a retenu la claire, contre la recommandation ; celle
+de l'ardoise est l'ancienne piste `#525965`, passée de l'encre au fond. Au
+passage, la question que le §23 laissait ouverte — `adjustIndistinguishableColors`
+relèvera-t-il une piste à 1,5:1 de l'ardoise ? — perd son objet, d'après la
+description du réglage, qui ne touche qu'aux avant-plans ; ce n'est pas
+vérifié à l'écran.
+
+L'arrondi va au plus proche, avec deux bornes : un huitième dès 1 %, le plein
+à 100 % seulement — une jauge pleine dirait le plafond atteint. Sous
+`NO_COLOR`, la jauge garde ses sept crans : sans fond, pas de rainure, et une
+valeur de 10 % ne serait qu'un trait isolé.
+
+### Deux exceptions à la règle du fond
+
+La règle 1 de la capsule — le fond appartient au compartiment, les fragments
+ne touchent qu'à l'avant-plan — a désormais deux exceptions, et deux
+seulement : un compartiment `Fond::ParPalier` pose un fond par tranche ; la
+jauge fine pose le fond de sa rainure, puis **rend** celui de sa tranche. Pour
+le rendre, elle doit le connaître au moment de s'écrire : le palier d'une
+fenêtre se calcule donc avant sa mise en forme, et `formater_fenetre` calcule
+le rythme — qui peut porter une projection en alerte sur une valeur calme —
+avant la mesure.
+
+### Le cadre, tranche par tranche
+
+Chaque tranche a son encre de contour : le gris sous les seuils, l'ambre ou le
+corail au-delà — les encres mêmes des valeurs, un test y veille. L'arc entre
+deux tranches prend l'encre du **pire** des deux voisins : géométriquement, il
+ferme la tranche de gauche, mais une mesure critique bordée d'un arc gris
+paraissait ouverte. Les bords s'écrivent tronçon par tronçon, une séquence
+d'encre à chaque changement seulement, et toujours ouverts par l'encre avant le
+blanc qui saute le cap : sans palier franchi, la sortie est octet pour octet
+celle de la 2.3.0 — `les_bords_du_cadre_encadrent_la_pilule_entre_les_caps`
+n'a pas bougé.
+
+### Une recommandation retirée dans l'heure
+
+Le chantier recommandait de donner sa jauge au contexte, et l'utilisateur
+l'avait acceptée. La relecture de `reglages.rs` a trouvé, au commentaire de
+`BLOCS_JAUGE`, la règle écrite le 26/08 : une fenêtre se remplit vers un
+plafond qu'on subit, le contexte se compacte — lui donner une jauge suggérerait
+une fatalité qu'il n'a pas. La question reposée avec cet argument,
+l'utilisateur a gardé la règle. La largeur au calme reste à 85 cellules.
+
+### La règle du §6, une dixième fois — et sans le dégel
+
+Rien ne bouge sous `NO_COLOR`, et l'oracle reste gelé : **0 divergence sur 109
+cas**, les 26 cas colorés sautés. Ceux-ci ont été relus contre un relevé de
+l'exe 2.3.0 fait avant d'écrire (`.backups\harnais-reference-exe-2.3.0_20260924.txt`) :
+séquences, blocs et heures neutralisés, **0 écart de texte** sur les 135 cas —
+les heures, parce que le harnais les calcule sur l'horloge, et que vingt et une
+minutes séparaient les deux passages. Les 26 pilules gardent leurs deux remises
+à zéro. **93 tests** (86, huit neufs, un remplacé), verts avec et sans
+`NO_COLOR` ; clippy `-D warnings` et `fmt` propres. Version **2.4.0**, copie
+des sources dans `.backups\20260924-114806_avant-mesures\`.
+
+### Le guide
+
+`generer-guide.ps1` a appris les huitièmes — une barre collée à gauche, sur
+le fond de la cellule — et une autre façon de placer les légendes : les plages
+de fond contiguës ne délimitent plus les tranches, puisque la rainure change de
+fond au milieu d'une mesure et que deux mesures calmes partagent la même
+ardoise ; une tranche commence désormais à chaque jonction. L'anatomie porte six
+légendes au lieu de quatre, la figure de la jauge montre 0, 3, 20, 45, 56, 78,
+97 et 100 %, celle des paliers une quatrième ligne où deux mesures ont chacune
+le leur. Légendes et texte relus, copie préalable dans
+`.backups\20260924-121533_avant-docs-mesures\`.
+
+### Ce qui reste ouvert
+
+- **Les états d'alerte dans Claude Code.** Le binaire a été validé à l'écran
+  au calme ; fonds ambre et rouge, cadre coloré et rainures de palier n'ont été
+  vus que dans Windows Terminal et dans les tests. Le mécanisme est celui des
+  jonctions, que Claude Code relaie : à confirmer au premier seuil franchi.
+- **`adjustIndistinguishableColors` et les fonds**, voir plus haut : d'après
+  la description, pas d'après l'écran.
+- **Les pistes D et E**, notées au canevas : l'effort en cinq marches de largeur
+  fixe, qui ôterait à l'emplacement sa dérive de trois colonnes, et une capsule
+  à deux rangs ou à un seul, qui rendrait la hauteur que le cadre coûte.

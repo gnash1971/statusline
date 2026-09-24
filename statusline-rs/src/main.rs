@@ -148,9 +148,7 @@ use crate::journal::{journaliser, noter_panique};
 use crate::largeur::largeur_console;
 use crate::reglages::{MARGE_LARGEUR, MODELE_PAR_DEFAUT, RVB_CORPS, RVB_LIEU, RVB_TETE};
 use crate::segments::{segment_abonnement, segment_contexte, segment_emplacement, segment_modele};
-use crate::sortie::{
-    assembler_capsules, confirmer_ligne, ecrire_ligne, teinte_du_palier, Compartiment, Palier,
-};
+use crate::sortie::{assembler_capsules, confirmer_ligne, ecrire_ligne, Compartiment};
 
 // ===========================================================================
 // 7. Assemblage
@@ -179,8 +177,10 @@ fn nom_modele(donnees: &Value) -> String {
 ///
 /// Les familles sont celles que la ligne décrivait déjà sans le dire : sous quel
 /// régime (l'abonnement), ce qui tourne, où l'on est, ce que la session
-/// consomme — cette dernière sur le fond du pire palier atteint, contexte,
-/// fenêtres, projections et épuisement confondus. Jusqu'au 19/09/2026 elles
+/// consomme — cette dernière mesure par mesure, chacune sur le fond de son
+/// propre palier, projection et épuisement compris : jusqu'au 24/09/2026, le
+/// pire des paliers teintait le compartiment entier, et un contexte calme se
+/// lisait sur le rouge d'une fenêtre épuisée. Jusqu'au 19/09/2026 elles
 /// étaient quatre groupes joints par un espace ; ce sont désormais quatre
 /// compartiments, chacun avec son fond — voir [`Compartiment`] et la forme de
 /// la capsule dans [`crate::reglages`].
@@ -214,25 +214,21 @@ fn assembler_ligne(donnees: &Value, modele: &str) -> String {
     // servent : l'abonnement, et la fenêtre propre au modèle.
     let config = lire_config();
 
-    // Les deux producteurs de mesures remontent leur palier ; le pire des deux
-    // teinte le compartiment.
-    let (contexte, palier_contexte) = match segment_contexte(donnees) {
-        Some((texte, palier)) => (Some(texte), palier),
-        None => (None, Palier::Aucun),
-    };
-    let (fenetres, palier_fenetres) = segment_fenetres(donnees, config.as_ref());
-    let pire = palier_contexte.max(palier_fenetres);
-
-    // Contexte puis fenêtres, un segment chacun : le compartiment les joint,
-    // et le repli en largeur peut couper entre eux.
-    let mut mesures = vec![contexte];
-    mesures.extend(fenetres.into_iter().map(Some));
+    // Contexte puis fenêtres, un segment chacun, chacun avec son palier : le
+    // compartiment les joint, les pose chacun sur son fond — chantier
+    // « mesures », 24/09/2026 —, et le repli en largeur peut couper entre eux.
+    let mut mesures = vec![segment_contexte(donnees)];
+    mesures.extend(
+        segment_fenetres(donnees, config.as_ref())
+            .into_iter()
+            .map(Some),
+    );
 
     let capsule = vec![
         Compartiment::nouveau(RVB_TETE, vec![segment_abonnement(config.as_ref())]),
         Compartiment::nouveau(RVB_CORPS, vec![Some(segment_modele(donnees, modele))]),
         Compartiment::nouveau(RVB_LIEU, vec![segment_emplacement(donnees)]),
-        Compartiment::nouveau(teinte_du_palier(pire), mesures),
+        Compartiment::mesures(mesures),
     ];
 
     // La sonde est lue une seconde fois par le journal, quelques microsecondes

@@ -29,7 +29,9 @@ use crate::reglages::{
     PREFIXE_PROJECTION, RATIO_MAX_EXTRAPOLATION, SEPARATEUR_INTERNE, SPAN_MINIMUM_RYTHME,
     UNITE_POURCENT,
 };
-use crate::sortie::{attenuer, au_palier, formater_mesure, formater_mesure_jaugee, Palier};
+use crate::sortie::{
+    attenuer, au_palier, formater_mesure, formater_mesure_jaugee, palier, Palier, Segment,
+};
 use crate::temps::{formater_instant, maintenant};
 use crate::usage::{estimer_derive, fenetre_modele};
 
@@ -292,6 +294,24 @@ fn formater_fenetre(
         None if memorisee => (mesure, MARQUEUR_MEMORISEE, true),
         None => (mesure, "", false),
     };
+    // Le rythme d'abord : son palier entre dans celui du segment, dont la
+    // jauge fine doit connaître le fond avant de s'écrire — Q2 du chantier
+    // « mesures », 24/09/2026. Il ne lit que la fenêtre et l'ancrage, rien de
+    // ce que la mesure produit.
+    let rythme = if figee {
+        None
+    } else {
+        ancrage.and_then(|ancrage| formater_rythme(fenetre, ancrage, descripteur, instant))
+    };
+    let pire = rythme
+        .as_ref()
+        .map_or(Palier::Aucun, |(_, palier_rythme)| *palier_rythme)
+        .max(palier(
+            pourcent,
+            descripteur.seuil,
+            descripteur.seuil_critique,
+        ));
+
     // Le marqueur reste collé à la valeur : il qualifie la mesure, pas le
     // compteur. La jauge, elle, précède les deux : elle annonce le remplissage
     // que le nombre chiffre, et vaut pour une valeur mémorisée ou estimée comme
@@ -303,20 +323,13 @@ fn formater_fenetre(
         pourcent,
         descripteur.seuil,
         descripteur.seuil_critique,
+        pire,
     );
     let mut morceaux = vec![mesure];
-    let mut pire = palier;
     let en_alerte = palier >= Palier::Alerte;
 
-    if !figee {
-        if let Some(ancrage) = ancrage {
-            if let Some((rythme, palier_rythme)) =
-                formater_rythme(fenetre, ancrage, descripteur, instant)
-            {
-                morceaux.push(rythme);
-                pire = pire.max(palier_rythme);
-            }
-        }
+    if let Some((rythme, _)) = rythme {
+        morceaux.push(rythme);
     }
 
     if descripteur.reset_toujours || en_alerte {
@@ -493,7 +506,12 @@ fn retenir(place: &mut Option<Candidat>, nouvelle: Option<Candidat>) {
 /// Fable contre 14 % pour tous les modèles — et la ligne dit 28, comme
 /// `/usage` ; le lendemain, 0 % pour Fable contre 2 %, et la ligne dit 0, comme
 /// `/usage` encore.
-pub(crate) fn segment_fenetres(donnees: &Value, config: Option<&Value>) -> (Vec<String>, Palier) {
+///
+/// **Chaque fenêtre rend son palier depuis le 24/09/2026** — chantier
+/// « mesures », piste A : le pire de ses valeurs, rythme compris, qui décide
+/// de son fond et de son contour. Le pire des fenêtres ne se calcule plus ici :
+/// aucune fenêtre ne teint plus ses voisines.
+pub(crate) fn segment_fenetres(donnees: &Value, config: Option<&Value>) -> Vec<Segment> {
     // Un seul instant de référence pour tout le passage : la pente affichée et
     // l'ancrage écrit dans le cache doivent parler de la même seconde.
     let instant = maintenant();
@@ -591,30 +609,20 @@ pub(crate) fn segment_fenetres(donnees: &Value, config: Option<&Value>) -> (Vec<
 
     ecrire_cache(&a_memoriser);
 
-    // Le pire palier des places retenues teinte le compartiment des mesures :
-    // une fenêtre écartée par `retenir` n'y compte pas, puisqu'elle ne
+    // Un segment par fenêtre, et non les fenêtres déjà jointes par « · » —
+    // lot 2 du chantier : c'est le compartiment qui les joint, et c'est entre
+    // elles que le repli en largeur peut couper. Chacun porte son pire palier ;
+    // une fenêtre écartée par `retenir` ne compte pour rien, puisqu'elle ne
     // s'affiche pas.
-    let retenues: Vec<Candidat> = places
+    places
         .into_iter()
         .filter_map(|(_, candidat)| candidat)
         .filter(|candidat| !candidat.segment.is_empty())
-        .collect();
-    let pire = retenues
-        .iter()
-        .map(|candidat| candidat.pire)
-        .max()
-        .unwrap_or(Palier::Aucun);
-
-    // Un segment par fenêtre, et non les fenêtres déjà jointes par « · » —
-    // lot 2 du chantier : c'est le compartiment qui les joint, et c'est entre
-    // elles que le repli en largeur peut couper.
-    (
-        retenues
-            .into_iter()
-            .map(|candidat| candidat.segment)
-            .collect(),
-        pire,
-    )
+        .map(|candidat| Segment {
+            texte: candidat.segment,
+            palier: candidat.pire,
+        })
+        .collect()
 }
 
 #[cfg(test)]

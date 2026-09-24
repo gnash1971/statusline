@@ -2,13 +2,13 @@
 <svg xmlns='http://www.w3.org/2000/svg' width='829' height='295' viewBox='0 0 829 295' role='img' aria-labelledby='titre'>
 <title id='titre'>statusline — 7j-paliers</title>
 <desc> ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
- Max 5x  Opus 5  atelier (main)  ctx 34% · 5h ▓░ 29% 18:03 · 7j █░ 45% 
+ Max 5x  Opus 5  atelier (main)  ctx 34%  5h ▋  29% 14:17  7j ▉  45% 
  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
- Max 5x  Opus 5  atelier (main)  ctx 34% · 5h ▓░ 29% 18:03 · 7j █▓ 78% 26/09 09:00 
+ Max 5x  Opus 5  atelier (main)  ctx 34%  5h ▋  29% 14:17  7j █▌ 78% 27/09 09:00 
  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
- Max 5x  Opus 5  atelier (main)  ctx 34% · 5h ▓░ 29% 18:03 · 7j ██ 88% 26/09 09:00 
+ Max 5x  Opus 5  atelier (main)  ctx 34%  5h ▋  29% 14:17  7j █▊ 88% 27/09 09:00 
  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔</desc>
 <style>text{font-family:'Cascadia Mono','Consolas','DejaVu Sans Mono',monospace;font-size:15px;dominant-baseline:central;white-space:pre}.l{font-family:'Segoe UI',system-ui,sans-serif;font-size:12px;fill:#8b949e;dominant-baseline:auto}</style>
 <rect x='0.5' y='0.5' width='828' height='294' rx='8' fill='#0f1114' stroke='#2a2f36'/>
@@ -17,15 +17,19 @@
 <rect x='23' y='53' width='72' height='21' fill='rgb(215,119,87)'/>
 <rect x='95' y='53' width='81' height='21' fill='rgb(59,65,75)'/>
 <rect x='176' y='53' width='153' height='21' fill='rgb(39,74,49)'/>
-<rect x='329' y='53' width='360' height='21' fill='rgb(59,65,75)'/>
+<rect x='329' y='53' width='135' height='21' fill='rgb(59,65,75)'/>
+<rect x='464' y='53' width='18' height='21' fill='rgb(82,89,101)'/>
+<rect x='482' y='53' width='144' height='21' fill='rgb(59,65,75)'/>
+<rect x='626' y='53' width='18' height='21' fill='rgb(82,89,101)'/>
+<rect x='644' y='53' width='45' height='21' fill='rgb(59,65,75)'/>
 <path d='M 22.5,53.6 A 8.2,9.9 0 0 0 22.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 95.5,53.6 A 8.2,9.9 0 0 1 95.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 176.5,53.6 A 8.2,9.9 0 0 1 176.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 329.5,53.6 A 8.2,9.9 0 0 1 329.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
-<rect x='467' y='53' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='53' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='56' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='56' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='56' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='59' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='59' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='62' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='62' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='65' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='65' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='68' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='68' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='68' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='71' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='71' width='3' height='3' fill='rgb(236,238,241)'/>
-<rect x='473' y='53' width='3' height='3' fill='rgb(82,89,101)'/><rect x='479' y='59' width='3' height='3' fill='rgb(82,89,101)'/><rect x='476' y='62' width='3' height='3' fill='rgb(82,89,101)'/><rect x='473' y='65' width='3' height='3' fill='rgb(82,89,101)'/><rect x='479' y='71' width='3' height='3' fill='rgb(82,89,101)'/>
-<rect x='626' y='53' width='9' height='21' fill='rgb(236,238,241)'/>
-<rect x='635' y='53' width='3' height='3' fill='rgb(82,89,101)'/><rect x='641' y='59' width='3' height='3' fill='rgb(82,89,101)'/><rect x='638' y='62' width='3' height='3' fill='rgb(82,89,101)'/><rect x='635' y='65' width='3' height='3' fill='rgb(82,89,101)'/><rect x='641' y='71' width='3' height='3' fill='rgb(82,89,101)'/>
+<path d='M 419.5,53.6 A 8.2,9.9 0 0 1 419.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<rect x='464' y='53' width='5.63' height='21' fill='rgb(236,238,241)'/>
+<path d='M 581.5,53.6 A 8.2,9.9 0 0 1 581.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<rect x='626' y='53' width='7.88' height='21' fill='rgb(236,238,241)'/>
 <path d='M 689.5,53.6 A 8.2,9.9 0 0 1 689.5,73.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <text x='32' y='63.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(42,13,2)' xml:space='preserve'>Max 5x </text>
 <text x='113' y='63.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Opus 5 </text>
@@ -35,31 +39,36 @@
 <text x='311' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'>) </text>
 <text x='347' y='63.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>ctx </text>
 <text x='383' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>34</text>
-<text x='401' y='63.5' textLength='9' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>%</text>
-<text x='410' y='63.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(124,132,142)' xml:space='preserve'> · </text>
+<text x='401' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% </text>
 <text x='437' y='63.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>5h </text>
-<text x='491' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>29</text>
-<text x='509' y='63.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 18:03</text>
-<text x='572' y='63.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(124,132,142)' xml:space='preserve'> · </text>
+<text x='473' y='63.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>  29</text>
+<text x='509' y='63.5' textLength='72' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 14:17 </text>
 <text x='599' y='63.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>7j </text>
-<text x='653' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>45</text>
+<text x='635' y='63.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>  45</text>
 <text x='671' y='63.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% </text>
 <rect x='23' y='74' width='666' height='2.63' fill='rgb(124,132,142)'/>
 <text class='l' x='14' y='119'>78 % : alerte, la remise à zéro apparaît</text>
-<rect x='23' y='143.38' width='774' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='23' y='143.38' width='558' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='581' y='143.38' width='216' height='2.63' fill='rgb(242,171,63)'/>
 <rect x='23' y='146' width='72' height='21' fill='rgb(215,119,87)'/>
 <rect x='95' y='146' width='81' height='21' fill='rgb(59,65,75)'/>
 <rect x='176' y='146' width='153' height='21' fill='rgb(39,74,49)'/>
-<rect x='329' y='146' width='468' height='21' fill='rgb(74,61,28)'/>
+<rect x='329' y='146' width='135' height='21' fill='rgb(59,65,75)'/>
+<rect x='464' y='146' width='18' height='21' fill='rgb(82,89,101)'/>
+<rect x='482' y='146' width='99' height='21' fill='rgb(59,65,75)'/>
+<rect x='581' y='146' width='45' height='21' fill='rgb(74,61,28)'/>
+<rect x='626' y='146' width='18' height='21' fill='rgb(106,90,48)'/>
+<rect x='644' y='146' width='153' height='21' fill='rgb(74,61,28)'/>
 <path d='M 22.5,146.6 A 8.2,9.9 0 0 0 22.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 95.5,146.6 A 8.2,9.9 0 0 1 95.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 176.5,146.6 A 8.2,9.9 0 0 1 176.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 329.5,146.6 A 8.2,9.9 0 0 1 329.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
-<rect x='467' y='146' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='146' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='149' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='149' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='149' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='152' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='152' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='155' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='155' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='158' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='158' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='161' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='161' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='161' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='164' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='164' width='3' height='3' fill='rgb(236,238,241)'/>
-<rect x='473' y='146' width='3' height='3' fill='rgb(82,89,101)'/><rect x='479' y='152' width='3' height='3' fill='rgb(82,89,101)'/><rect x='476' y='155' width='3' height='3' fill='rgb(82,89,101)'/><rect x='473' y='158' width='3' height='3' fill='rgb(82,89,101)'/><rect x='479' y='164' width='3' height='3' fill='rgb(82,89,101)'/>
+<path d='M 419.5,146.6 A 8.2,9.9 0 0 1 419.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<rect x='464' y='146' width='5.63' height='21' fill='rgb(236,238,241)'/>
+<path d='M 581.5,146.6 A 8.2,9.9 0 0 1 581.5,166.4' fill='none' stroke='rgb(242,171,63)' stroke-width='1.2'/>
 <rect x='626' y='146' width='9' height='21' fill='rgb(242,171,63)'/>
-<rect x='638' y='146' width='3' height='3' fill='rgb(242,171,63)'/><rect x='641' y='146' width='3' height='3' fill='rgb(242,171,63)'/><rect x='635' y='149' width='3' height='3' fill='rgb(242,171,63)'/><rect x='638' y='149' width='3' height='3' fill='rgb(242,171,63)'/><rect x='641' y='149' width='3' height='3' fill='rgb(242,171,63)'/><rect x='635' y='152' width='3' height='3' fill='rgb(242,171,63)'/><rect x='638' y='152' width='3' height='3' fill='rgb(242,171,63)'/><rect x='635' y='155' width='3' height='3' fill='rgb(242,171,63)'/><rect x='641' y='155' width='3' height='3' fill='rgb(242,171,63)'/><rect x='638' y='158' width='3' height='3' fill='rgb(242,171,63)'/><rect x='641' y='158' width='3' height='3' fill='rgb(242,171,63)'/><rect x='635' y='161' width='3' height='3' fill='rgb(242,171,63)'/><rect x='638' y='161' width='3' height='3' fill='rgb(242,171,63)'/><rect x='641' y='161' width='3' height='3' fill='rgb(242,171,63)'/><rect x='635' y='164' width='3' height='3' fill='rgb(242,171,63)'/><rect x='638' y='164' width='3' height='3' fill='rgb(242,171,63)'/>
-<path d='M 797.5,146.6 A 8.2,9.9 0 0 1 797.5,166.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<rect x='635' y='146' width='4.5' height='21' fill='rgb(242,171,63)'/>
+<path d='M 797.5,146.6 A 8.2,9.9 0 0 1 797.5,166.4' fill='none' stroke='rgb(242,171,63)' stroke-width='1.2'/>
 <text x='32' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(42,13,2)' xml:space='preserve'>Max 5x </text>
 <text x='113' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Opus 5 </text>
 <text x='194' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>atelier</text>
@@ -68,31 +77,37 @@
 <text x='311' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'>) </text>
 <text x='347' y='156.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>ctx </text>
 <text x='383' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>34</text>
-<text x='401' y='156.5' textLength='9' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>%</text>
-<text x='410' y='156.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(124,132,142)' xml:space='preserve'> · </text>
+<text x='401' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% </text>
 <text x='437' y='156.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>5h </text>
-<text x='491' y='156.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>29</text>
-<text x='509' y='156.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 18:03</text>
-<text x='572' y='156.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(124,132,142)' xml:space='preserve'> · </text>
+<text x='473' y='156.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>  29</text>
+<text x='509' y='156.5' textLength='72' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 14:17 </text>
 <text x='599' y='156.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>7j </text>
 <text x='644' y='156.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(242,171,63)' xml:space='preserve'> 78</text>
-<text x='671' y='156.5' textLength='126' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 26/09 09:00 </text>
-<rect x='23' y='167' width='774' height='2.63' fill='rgb(124,132,142)'/>
+<text x='671' y='156.5' textLength='126' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 27/09 09:00 </text>
+<rect x='23' y='167' width='558' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='581' y='167' width='216' height='2.63' fill='rgb(242,171,63)'/>
 <text class='l' x='14' y='212'>88 % : critique</text>
-<rect x='23' y='236.38' width='774' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='23' y='236.38' width='558' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='581' y='236.38' width='216' height='2.63' fill='rgb(249,148,138)'/>
 <rect x='23' y='239' width='72' height='21' fill='rgb(215,119,87)'/>
 <rect x='95' y='239' width='81' height='21' fill='rgb(59,65,75)'/>
 <rect x='176' y='239' width='153' height='21' fill='rgb(39,74,49)'/>
-<rect x='329' y='239' width='468' height='21' fill='rgb(83,40,37)'/>
+<rect x='329' y='239' width='135' height='21' fill='rgb(59,65,75)'/>
+<rect x='464' y='239' width='18' height='21' fill='rgb(82,89,101)'/>
+<rect x='482' y='239' width='99' height='21' fill='rgb(59,65,75)'/>
+<rect x='581' y='239' width='45' height='21' fill='rgb(83,40,37)'/>
+<rect x='626' y='239' width='18' height='21' fill='rgb(112,62,58)'/>
+<rect x='644' y='239' width='153' height='21' fill='rgb(83,40,37)'/>
 <path d='M 22.5,239.6 A 8.2,9.9 0 0 0 22.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 95.5,239.6 A 8.2,9.9 0 0 1 95.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 176.5,239.6 A 8.2,9.9 0 0 1 176.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
 <path d='M 329.5,239.6 A 8.2,9.9 0 0 1 329.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
-<rect x='467' y='239' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='239' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='242' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='242' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='242' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='245' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='245' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='248' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='248' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='251' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='251' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='254' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='254' width='3' height='3' fill='rgb(236,238,241)'/><rect x='470' y='254' width='3' height='3' fill='rgb(236,238,241)'/><rect x='464' y='257' width='3' height='3' fill='rgb(236,238,241)'/><rect x='467' y='257' width='3' height='3' fill='rgb(236,238,241)'/>
-<rect x='473' y='239' width='3' height='3' fill='rgb(82,89,101)'/><rect x='479' y='245' width='3' height='3' fill='rgb(82,89,101)'/><rect x='476' y='248' width='3' height='3' fill='rgb(82,89,101)'/><rect x='473' y='251' width='3' height='3' fill='rgb(82,89,101)'/><rect x='479' y='257' width='3' height='3' fill='rgb(82,89,101)'/>
+<path d='M 419.5,239.6 A 8.2,9.9 0 0 1 419.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<rect x='464' y='239' width='5.63' height='21' fill='rgb(236,238,241)'/>
+<path d='M 581.5,239.6 A 8.2,9.9 0 0 1 581.5,259.4' fill='none' stroke='rgb(249,148,138)' stroke-width='1.2'/>
 <rect x='626' y='239' width='9' height='21' fill='rgb(249,148,138)'/>
-<rect x='635' y='239' width='9' height='21' fill='rgb(249,148,138)'/>
-<path d='M 797.5,239.6 A 8.2,9.9 0 0 1 797.5,259.4' fill='none' stroke='rgb(124,132,142)' stroke-width='1.2'/>
+<rect x='635' y='239' width='6.75' height='21' fill='rgb(249,148,138)'/>
+<path d='M 797.5,239.6 A 8.2,9.9 0 0 1 797.5,259.4' fill='none' stroke='rgb(249,148,138)' stroke-width='1.2'/>
 <text x='32' y='249.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(42,13,2)' xml:space='preserve'>Max 5x </text>
 <text x='113' y='249.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>Opus 5 </text>
 <text x='194' y='249.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(198,232,184)' xml:space='preserve'>atelier</text>
@@ -101,14 +116,13 @@
 <text x='311' y='249.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(147,192,142)' xml:space='preserve'>) </text>
 <text x='347' y='249.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>ctx </text>
 <text x='383' y='249.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>34</text>
-<text x='401' y='249.5' textLength='9' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>%</text>
-<text x='410' y='249.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(124,132,142)' xml:space='preserve'> · </text>
+<text x='401' y='249.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% </text>
 <text x='437' y='249.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>5h </text>
-<text x='491' y='249.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>29</text>
-<text x='509' y='249.5' textLength='63' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 18:03</text>
-<text x='572' y='249.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(124,132,142)' xml:space='preserve'> · </text>
+<text x='473' y='249.5' textLength='36' lengthAdjust='spacingAndGlyphs' fill='rgb(236,238,241)' xml:space='preserve'>  29</text>
+<text x='509' y='249.5' textLength='72' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 14:17 </text>
 <text x='599' y='249.5' textLength='27' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>7j </text>
 <text x='653' y='249.5' textLength='18' lengthAdjust='spacingAndGlyphs' fill='rgb(249,148,138)' font-weight='bold' xml:space='preserve'>88</text>
-<text x='671' y='249.5' textLength='126' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 26/09 09:00 </text>
-<rect x='23' y='260' width='774' height='2.63' fill='rgb(124,132,142)'/>
+<text x='671' y='249.5' textLength='126' lengthAdjust='spacingAndGlyphs' fill='rgb(169,176,184)' xml:space='preserve'>% 27/09 09:00 </text>
+<rect x='23' y='260' width='558' height='2.63' fill='rgb(124,132,142)'/>
+<rect x='581' y='260' width='216' height='2.63' fill='rgb(249,148,138)'/>
 </svg>

@@ -112,7 +112,7 @@
 
 <header class="entete">
   <h1>La ligne de statut, cas par cas
-    <small>Guide utilisateur de <code>statusline</code> pour Claude Code sous Windows — version 2.3.0</small>
+    <small>Guide utilisateur de <code>statusline</code> pour Claude Code sous Windows — version 2.4.0</small>
   </h1>
   <p>Cette page montre tout ce que la ligne de statut peut afficher, et pourquoi elle l'affiche
   ainsi. <strong>Toutes les figures sont de vraies sorties du programme</strong> : chaque image est
@@ -143,15 +143,16 @@
 
 <p>La ligne est une <strong>capsule</strong> à compartiments. De gauche à droite : sous quel régime
 on travaille, ce qui tourne, où l'on est, et ce que la session consomme. Chaque compartiment a son
-fond ; les caps arrondis, les jonctions et les deux bords fins sont tracés dans un même gris de
-contour.</p>
+fond ; les caps arrondis, les jonctions et les deux bords fins sont tracés dans un gris de contour
+— sauf autour d'une mesure en alerte, qui les prend à son encre.</p>
 
 <figure class="ajustee">
-  <img src="guide/anatomie.svg" alt="La capsule complète et ses quatre compartiments : abonnement, modèle, emplacement, contexte et fenêtres">
-  <figcaption><strong>Les quatre compartiments.</strong> La tête (abonnement) en terre cuite ; l'identité
-  (modèle, effort) et les mesures en ardoise ; l'emplacement en sauge. Le rang du dessus et
-  celui du dessous ferment le cadre : ce sont deux vraies lignes de texte, faites de huitièmes de
-  bloc, que Claude Code affiche comme le reste.</figcaption>
+  <img src="guide/anatomie.svg" alt="La capsule complète : abonnement, modèle, emplacement, puis le contexte, la fenêtre de 5 heures et la fenêtre de 7 jours, chacun dans sa tranche">
+  <figcaption><strong>Quatre compartiments, six tranches.</strong> La tête (abonnement) en terre
+  cuite ; l'identité (modèle, effort) en ardoise ; l'emplacement en sauge ; puis les mesures, une
+  tranche chacune, en ardoise tant qu'elles sont sous leurs seuils, jointes par le même arc que les
+  compartiments. Le rang du dessus et celui du dessous ferment le cadre : ce sont deux vraies lignes
+  de texte, faites de huitièmes de bloc, que Claude Code affiche comme le reste.</figcaption>
 </figure>
 
 <p>Trois règles suffisent à lire tout ce qui suit :</p>
@@ -163,9 +164,10 @@ contour.</p>
   Git, pas de parenthèses ; pas de mesure, pas de segment. La capsule se resserre au lieu d'afficher
   des vides — et elle n'est jamais blanche : une ligne vide effacerait l'affichage dans Claude Code,
   ce qui est pire qu'une information partielle.</li>
-  <li><strong>La couleur du compartiment des mesures dit le palier.</strong> Ardoise tant que tout
-  est sous les seuils, ambre sombre dès qu'un compteur franchit son seuil d'alerte, rouge sombre au
-  seuil critique. L'œil n'a pas à lire les nombres pour savoir s'il faut lever le pied.</li>
+  <li><strong>La couleur d'une mesure dit son palier.</strong> Ardoise sous les seuils, ambre sombre
+  dès que le compteur franchit son seuil d'alerte, rouge sombre au seuil critique — et son cadre
+  prend l'encre du palier. L'œil n'a pas à lire les nombres pour savoir s'il faut lever le pied, ni
+  lequel des trois l'exige.</li>
 </ul>
 
 <!-- ------------------------------------------------------------------ -->
@@ -272,10 +274,11 @@ renvoie les deux dans la même.</p>
 <!-- ------------------------------------------------------------------ -->
 <h2 id="mesures">5. Les mesures : contexte et fenêtres</h2>
 
-<p>Le dernier compartiment porte jusqu'à trois compteurs, séparés par un point médian :
-l'occupation du contexte (<code>ctx</code>), la fenêtre de 5 heures (<code>5h</code>) et la fenêtre
-de 7 jours (<code>7j</code>). Chacun a ses deux seuils — alerte, puis critique — et c'est le pire
-d'entre eux qui teinte le compartiment.</p>
+<p>Le dernier compartiment porte jusqu'à trois compteurs, chacun dans sa tranche, joints par un
+arc : l'occupation du contexte (<code>ctx</code>), la fenêtre de 5 heures (<code>5h</code>) et la
+fenêtre de 7 jours (<code>7j</code>). Chacun a ses deux seuils — alerte, puis critique — et c'est
+le sien qui teinte sa tranche : un contexte calme reste sur l'ardoise quand la fenêtre de 5 heures
+passe au rouge. Jusqu'à la version 2.3.0, le pire des trois teintait le compartiment entier.</p>
 
 <h3>Le contexte</h3>
 <p><code>ctx</code> affiche <code>context_window.used_percentage</code>. Il est <strong>absent tant
@@ -284,16 +287,22 @@ tant que rien n'a été renvoyé — plutôt que d'afficher un « ctx 0 % » qui
 Seuils : 80 % et 90 %. Les trois états sont montrés en <a href="#paliers">§ 6</a>.</p>
 
 <h3>La jauge</h3>
-<p>Chaque fenêtre précède sa valeur d'une jauge de deux cellules, à sept crans : un cran tous les
-14,3 points. Elle annonce le remplissage que le nombre chiffre, et vaut pour une valeur mémorisée ou
-estimée comme pour une mesure fraîche.</p>
+<p>Chaque fenêtre précède sa valeur d'une jauge fine de deux cellules, à seize crans : un cran
+tous les 6,25 points. Le plein se trace en huitièmes de bloc (<code>▏</code> à <code>█</code>),
+la cellule de gauche d'abord, dans l'encre du palier de la valeur ; le vide est une
+<strong>rainure</strong>, un fond un ton au-dessus de celui de la mesure. Elle annonce le remplissage
+que le nombre chiffre, et vaut pour une valeur mémorisée ou estimée comme pour une mesure fraîche.
+Le contexte n'en a pas : une fenêtre se remplit vers un plafond qu'on subit, le contexte se
+compacte.</p>
 
 <figure>
-  <img src="guide/jauge.svg" alt="Sept lignes montrant les sept crans de la jauge de 0 à 86 %">
-  <figcaption><strong>Les sept crans</strong> : <code>░░</code> jusqu'à 14 %, <code>▒░</code> à
-  partir de 15, <code>▓░</code> de 29, <code>█░</code> de 43, <code>█▒</code> de 58,
-  <code>█▓</code> de 72, <code>██</code> de 86. La dernière ligne est en rouge : 86 % dépasse le
-  seuil critique de la fenêtre de 7 jours (85 %), et l'échéance apparaît.</figcaption>
+  <img src="guide/jauge.svg" alt="Huit lignes montrant la jauge fine de la fenêtre de 7 jours à 0, 3, 20, 45, 56, 78, 97 et 100 %">
+  <figcaption><strong>La jauge fine</strong> : à 0 %, la rainure nue ; dès 3 %, un huitième ; à
+  56 %, la cellule de droite s'entame ; à 97 %, elle n'est pas encore pleine — les deux cellules ne
+  se remplissent qu'à 100 %, une jauge pleine disant le plafond atteint. À 78 %, la fenêtre de
+  7 jours passe son seuil d'alerte (75 %) : jauge ambre sur rainure ambre, et l'échéance apparaît ;
+  à 97 et 100 %, le seuil critique (85 %) : corail. Sous <code>NO_COLOR</code>, la jauge garde ses
+  sept crans de densité — voir <a href="#sans-couleur">§ 8</a>.</figcaption>
 </figure>
 
 <h3>La fenêtre de 5 heures</h3>
@@ -307,7 +316,8 @@ s'intercaler le <strong>rythme</strong>, mesuré par la ligne elle-même.</p>
   <figcaption><strong>Les quatre formes du segment.</strong> La ligne mémorise la première
   observation qu'elle fait de chaque fenêtre (instant et pourcentage) dans son cache ; à partir de
   dix minutes d'observation, elle projette la consommation à la remise à zéro : « → 44 % ». Une
-  projection qui franchit un seuil prend la couleur du palier. Quand le plafond arriverait
+  projection qui franchit un seuil prend la couleur du palier, et la fenêtre entière son fond et son
+  cadre — la jauge, elle, garde l'encre de la valeur mesurée, sur la rainure du palier. Quand le plafond arriverait
   <em>avant</em> la remise à zéro, la projection cède la place à l'heure prévue du plafond,
   « épuisé 13:00 », toujours au palier critique : c'est le seul cas où la ligne annonce quelque
   chose qui n'est pas encore arrivé.</figcaption>
@@ -378,13 +388,16 @@ que Fable a déjà consommé la même semaine.</p>
 <!-- ------------------------------------------------------------------ -->
 <h2 id="paliers">6. Les paliers et les couleurs</h2>
 
-<p>Le corps de la capsule est neutre ; c'est le palier qui colore. Le compartiment des mesures prend
-le fond du pire palier qu'il porte, et le compteur fautif prend l'encre correspondante — en gras au
-palier critique.</p>
+<p>Le corps de la capsule est neutre ; c'est le palier qui colore. Chaque mesure prend le fond de
+son propre palier, sa valeur l'encre correspondante — en gras au palier critique —, et son cadre
+cette même encre : les deux bords au-dessus et au-dessous d'elle, et l'arc qui la ferme. L'arc qui
+sépare deux mesures prend l'encre de la plus grave des deux.</p>
 
 <figure class="ajustee">
-  <img src="guide/paliers.svg" alt="Trois lignes complètes : contexte à 34 % en ardoise, à 82 % en ambre, à 93 % en rouge sombre avec la valeur en gras">
-  <figcaption><strong>Le même compartiment sous ses trois fonds.</strong> Le reste de la capsule ne
+  <img src="guide/paliers.svg" alt="Quatre lignes complètes : contexte à 34 % en ardoise ; à 82 % en ambre, cadre ambre ; à 93 % en rouge sombre, cadre corail et valeur en gras ; contexte à 93 % et fenêtre de 7 jours à 78 %, chacun à son palier">
+  <figcaption><strong>Une mesure, son palier.</strong> Le contexte seul change de fond et de cadre ;
+  les fenêtres restent sur l'ardoise. Dernière ligne : contexte critique et fenêtre de 7 jours en
+  alerte, chacun le sien — l'arc qui les sépare prend le corail du pire. Le reste de la capsule ne
   bouge pas : la tête, l'identité et l'emplacement ne portent aucun palier.</figcaption>
 </figure>
 
@@ -403,11 +416,14 @@ palier critique.</p>
   <thead><tr><th>Teinte</th><th>Rôle</th><th>RVB</th></tr></thead>
   <tbody>
     <tr><td><span class="pastille" style="background:rgb(215,119,87)"></span>terre cuite</td><td>fond de la tête</td><td>215 · 119 · 87</td></tr>
-    <tr><td><span class="pastille" style="background:rgb(59,65,75)"></span>ardoise</td><td>fond de l'identité et des mesures</td><td>59 · 65 · 75</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(59,65,75)"></span>ardoise</td><td>fond de l'identité et des mesures sous leurs seuils</td><td>59 · 65 · 75</td></tr>
     <tr><td><span class="pastille" style="background:rgb(39,74,49)"></span>sauge</td><td>fond de l'emplacement</td><td>39 · 74 · 49</td></tr>
-    <tr><td><span class="pastille" style="background:rgb(74,61,28)"></span>ambre sombre</td><td>fond des mesures en alerte</td><td>74 · 61 · 28</td></tr>
-    <tr><td><span class="pastille" style="background:rgb(83,40,37)"></span>rouge sombre</td><td>fond des mesures au critique</td><td>83 · 40 · 37</td></tr>
-    <tr><td><span class="pastille" style="background:rgb(124,132,142)"></span>gris de contour</td><td>caps, jonctions, bords, points séparateurs</td><td>124 · 132 · 142</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(74,61,28)"></span>ambre sombre</td><td>fond d'une mesure en alerte</td><td>74 · 61 · 28</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(83,40,37)"></span>rouge sombre</td><td>fond d'une mesure au critique</td><td>83 · 40 · 37</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(242,171,63)"></span>ambre</td><td>valeur, jauge et cadre d'une mesure en alerte</td><td>242 · 171 · 63</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(249,148,138)"></span>corail</td><td>valeur, jauge et cadre d'une mesure au critique</td><td>249 · 148 · 138</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(82,89,101)"></span>rainure</td><td>vide de la jauge sur l'ardoise (sur l'ambre sombre : 106 · 90 · 48 ; sur le rouge sombre : 112 · 62 · 58)</td><td>82 · 89 · 101</td></tr>
+    <tr><td><span class="pastille" style="background:rgb(124,132,142)"></span>gris de contour</td><td>caps, jonctions et bords sous les seuils</td><td>124 · 132 · 142</td></tr>
     <tr><td><span class="pastille" style="background:rgb(147,197,208)"></span>cyan des marqueurs</td><td>1M, fast, sans réflexion</td><td>147 · 197 · 208</td></tr>
   </tbody>
 </table>
@@ -434,9 +450,8 @@ moins une cellule de marge).</p>
 <figure class="ajustee">
   <img src="guide/largeur-40.svg" alt="À 40 colonnes, trois capsules : la tête, l'identité et l'emplacement, puis les mesures coupées en deux">
   <figcaption><strong>40 colonnes :</strong> le compartiment des mesures, seul, déborde encore ;
-  la coupe descend alors <em>entre segments</em>, chaque morceau gardant la teinte de son
-  compartiment. Un segment seul plus large que la console s'émet tel quel, il n'y a plus rien à
-  faire.</figcaption>
+  la coupe descend alors <em>entre segments</em>, chaque mesure gardant son fond et son cadre. Un
+  segment seul plus large que la console s'émet tel quel, il n'y a plus rien à faire.</figcaption>
 </figure>
 
 <p>Le nombre de rangs croît donc avec l'étroitesse de la fenêtre, comme le ferait l'enroulement de
@@ -455,7 +470,10 @@ seule ligne, que le terminal enroule s'il le faut.</p>
   <img src="guide/sans-couleur.svg" alt="La même ligne sous NO_COLOR : un seul rang de texte, sans fond ni cadre">
   <figcaption><strong>La ligne nue.</strong> C'est, octet pour octet, la ligne d'avant la capsule —
   et celle que le script PowerShell d'origine, <code>statusline.ps1</code>, produit encore : le
-  harnais de non-régression compare les deux sous <code>NO_COLOR</code>.</figcaption>
+  harnais de non-régression compare les deux sous <code>NO_COLOR</code>. Les mesures y restent
+  jointes par le point médian, et la jauge y garde ses sept crans de densité (<code>░░</code> à
+  <code>██</code>, un cran tous les 14,3 points) : sans fond, la jauge fine n'aurait pas de
+  rainure, et une valeur de 10 % n'y serait qu'un trait isolé.</figcaption>
 </figure>
 
 <!-- ------------------------------------------------------------------ -->
@@ -491,9 +509,11 @@ binaire de la dernière Release, ou <code>cargo build --release</code> — et
 
 <div class="note">
   <p><strong>Windows Terminal est conseillé.</strong> Aucune police du poste n'a besoin de porter les
-  arcs Powerline (<code>U+E0B5</code>, <code>U+E0B7</code>) ni les huitièmes de bloc du cadre :
-  Windows Terminal les trace lui-même, et le harnais l'a vérifié sans réglage particulier. Dans un
-  autre terminal, les arcs peuvent manquer ; le contenu, lui, reste lisible.</p>
+  arcs Powerline (<code>U+E0B5</code>, <code>U+E0B7</code>) ni les huitièmes de bloc du cadre et de
+  la jauge (<code>▁ ▔</code>, <code>▏</code> à <code>▉</code>) : Windows Terminal les trace
+  lui-même, sans réglage particulier — vérifié à l'écran pour les huitièmes de la jauge, huit
+  largeurs distinctes en corps 8. Dans un autre terminal, arcs et huitièmes peuvent manquer ou
+  sortir d'une police de repli ; le contenu, lui, reste lisible.</p>
 </div>
 
 <h3>Où vit l'état</h3>

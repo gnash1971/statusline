@@ -13,10 +13,12 @@
     colonnes quelle que soit la fenêtre d'où ce script est lancé.
 
     La sortie ANSI est convertie cellule par cellule en SVG. Les fonds et les
-    avant-plans 24 bits sont repris tels quels ; les arcs Powerline (U+E0B5,
-    U+E0B7), les bords du cadre (▁ ▔) et les blocs de la jauge (░ ▒ ▓ █) sont
-    tracés en formes, comme Windows Terminal les trace lui-même — l'image ne
-    dépend donc pas des polices du lecteur, et le texte reste du texte.
+    avant-plans 24 bits sont repris tels quels — la rainure de la jauge fine
+    est un fond comme un autre ; les arcs Powerline (U+E0B5, U+E0B7), les bords
+    du cadre (▁ ▔), les huitièmes de la jauge fine (▏ à ▉, depuis la 2.4.0) et
+    les densités de la jauge sans couleur (░ ▒ ▓ █) sont tracés en formes,
+    comme Windows Terminal les trace lui-même — l'image ne dépend donc pas des
+    polices du lecteur, et le texte reste du texte.
 
 .PARAMETER Exe
     Chemin de statusline.exe. Par défaut : statusline-rs\target\release\ à côté
@@ -344,6 +346,10 @@ $BORD_HAUT = [char]0x2581
 $BORD_BAS = [char]0x2594
 $OMBRES = @{ ([char]0x2591) = 1; ([char]0x2592) = 2; ([char]0x2593) = 3; ([char]0x2588) = 4 }
 $TRAME = 3         # côté d'un carré de trame
+# Huitièmes de la jauge fine, de ▏ (U+258F, un huitième) à ▉ (U+2589, sept) ;
+# le plein, █, est déjà une ombre de densité 4.
+$HUITIEMES = @{}
+for ($k = 1; $k -le 7; $k++) { $HUITIEMES[[char](0x2590 - $k)] = $k }
 
 # Trame une cellule à la densité demandée (1 : un carré sur quatre, 2 : un sur
 # deux, 3 : trois sur quatre, 4 : pleine), comme Windows Terminal trace ░ ▒ ▓ █.
@@ -438,6 +444,11 @@ function Add-Rang {
                 if ($OMBRES.ContainsKey($c)) {
                     $forme = New-Trame -X $x -Y $Y0 -Densite $OMBRES[$c] -Encre $fg
                 }
+                # Un huitième : une barre collée à gauche, pleine hauteur, sur
+                # le fond de la cellule — la rainure.
+                elseif ($HUITIEMES.ContainsKey($c)) {
+                    $forme = "<rect x='$(Px $x)' y='$(Px $Y0)' width='$(Px ($CW * $HUITIEMES[$c] / 8))' height='$LH' fill='$fg'/>"
+                }
             }
         }
         if ($forme) {
@@ -513,17 +524,27 @@ function New-Svg {
         $y += $ECART
     }
 
-    # Légendes : une accolade sous chaque compartiment du premier rang coloré,
-    # les compartiments étant les plages de fond contiguës.
+    # Légendes : une accolade sous chaque tranche du premier rang coloré — un
+    # compartiment, ou une mesure depuis la 2.4.0. Une tranche commence à la
+    # première cellule de fond, puis à chaque jonction (l'arc porte le fond de
+    # la tranche qu'il ouvre). Les plages de fond contiguës ne suffisent plus :
+    # la rainure d'une jauge change de fond au milieu d'une mesure, et deux
+    # mesures calmes partagent la même ardoise.
     if ($Legendes -and $rangPilule) {
         $plages = [System.Collections.Generic.List[object]]::new()
-        $col = 0
-        while ($col -lt $rangPilule.Count) {
-            $bg = $rangPilule[$col].Bg
-            $debut = $col
-            while ($col -lt $rangPilule.Count -and $rangPilule[$col].Bg -eq $bg) { $col++ }
-            if ($bg) { $plages.Add(@{ Debut = $debut; Fin = $col }) }
+        $debut = -1
+        $fin = -1
+        for ($col = 0; $col -lt $rangPilule.Count; $col++) {
+            $cellule = $rangPilule[$col]
+            if (-not $cellule.Bg) { continue }
+            if ($debut -ge 0 -and $cellule.Car -eq $CAP_DROIT) {
+                $plages.Add(@{ Debut = $debut; Fin = $col })
+                $debut = $col
+            }
+            elseif ($debut -lt 0) { $debut = $col }
+            $fin = $col + 1
         }
+        if ($debut -ge 0) { $plages.Add(@{ Debut = $debut; Fin = $fin }) }
         for ($i = 0; $i -lt [Math]::Min($plages.Count, $Legendes.Count); $i++) {
             $x1 = $PAD + $plages[$i].Debut * $CW + 2
             $x2 = $PAD + $plages[$i].Fin * $CW - 2
@@ -555,13 +576,16 @@ function Get-Cas {
 
     $fable = New-Socle -Dossier $sousDossier -Modele 'Fable 5.1' -Id 'claude-fable-5-1'
 
-    $jauge = foreach ($p in @(0, 15, 29, 43, 58, 72, 86)) {
+    # La jauge fine depuis la 2.4.0 : seize huitièmes, au moins un dès 1 %, le
+    # plein à 100 % seulement ; 78 passe le seuil d'alerte hebdomadaire (75),
+    # 97 le seuil critique (85).
+    $jauge = foreach ($p in @(0, 3, 20, 45, 56, 78, 97, 100)) {
         @{ Etiquette = "$p %"; Payload = (Json (Avec $identite ([ordered]@{ rate_limits = [ordered]@{ seven_day = [ordered]@{ used_percentage = $p; resets_at = $r7 } } }))) }
     }
 
     return @(
         @{ Id = 'anatomie'; Largeur = 120
-           Legendes = @('abonnement', 'modèle', 'emplacement', 'contexte · fenêtres')
+           Legendes = @('abonnement', 'modèle', 'emplacement', 'contexte', 'fenêtre de 5 heures', 'fenêtre de 7 jours')
            Sorties = @(@{ Payload = (Json $complet); Cache = $ancrage }) }
 
         @{ Id = 'tete-abonnements'; Largeur = 120; Sorties = @(
@@ -611,7 +635,7 @@ function Get-Cas {
         @{ Id = '5h-formes'; Largeur = 120; Sorties = @(
             @{ Etiquette = 'mesure fraîche : jauge, valeur, heure de remise à zéro'; Payload = (Json (Avec $identite (Mesures 34 29 45))) }
             @{ Etiquette = 'rythme mesuré depuis une heure : projection à la remise à zéro'; Payload = (Json (Avec $identite (Mesures 34 20 45))); Cache = (Ancre5h 20 8) }
-            @{ Etiquette = 'la projection franchit le seuil : elle prend la couleur du palier'; Payload = (Json (Avec $identite (Mesures 34 40 45))); Cache = (Ancre5h 40 18) }
+            @{ Etiquette = 'la projection franchit le seuil : elle prend la couleur du palier, la fenêtre son fond et son cadre'; Payload = (Json (Avec $identite (Mesures 34 40 45))); Cache = (Ancre5h 40 18) }
             @{ Etiquette = 'le plafond arrivera avant la remise à zéro : heure d''épuisement'; Payload = (Json (Avec $identite (Mesures 34 40 45))); Cache = (Ancre5h 40 5) }
         ) }
 
@@ -639,8 +663,9 @@ function Get-Cas {
 
         @{ Id = 'paliers'; Largeur = 120; Sorties = @(
             @{ Etiquette = 'contexte à 34 % : ardoise'; Payload = (Json (Avec $courant (Mesures 34 29 45))) }
-            @{ Etiquette = 'contexte à 82 % : alerte, le compartiment des mesures passe à l''ambre'; Payload = (Json (Avec $courant (Mesures 82 29 45))) }
-            @{ Etiquette = 'contexte à 93 % : critique, rouge sombre et valeur en gras'; Payload = (Json (Avec $courant (Mesures 93 29 45))) }
+            @{ Etiquette = 'contexte à 82 % : alerte, le contexte seul passe à l''ambre, son cadre aussi'; Payload = (Json (Avec $courant (Mesures 82 29 45))) }
+            @{ Etiquette = 'contexte à 93 % : critique, rouge sombre, cadre corail, valeur en gras'; Payload = (Json (Avec $courant (Mesures 93 29 45))) }
+            @{ Etiquette = 'contexte à 93 %, 7 jours à 78 % : chaque mesure son palier ; l''arc entre deux mesures prend le pire'; Payload = (Json (Avec $courant (Mesures 93 29 78))) }
         ) }
 
         @{ Id = 'largeur-120'; Largeur = 120; Cadre = 'console'; Sorties = @(@{ Payload = (Json $complet); Cache = $ancrage }) }

@@ -9,9 +9,9 @@ un binaire Rust en une quinzaine de millisecondes.
  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
  Pro  Opus 5 xhigh  …\_plus-rust_ 
  ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
- ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
- ctx 34% · 5h ▒░ 20% → 41% 15:00 · 7j █░ 45% 
- ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+ ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+ ctx 34%  5h ▍  20% → 41% 15:00  7j ▉  45% 
+ ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
 ```
 
 Ici la forme dépliée, celle d'une console étroite ; sur une console large la
@@ -22,7 +22,8 @@ capsule tient sur un rang :
 Le **[guide utilisateur](guide.html)** montre chaque cas d'usage — abonnements,
 marqueurs, emplacement, jauge, projections, paliers, repli en largeur — sur de
 vraies sorties du binaire, et les explique. Sous `NO_COLOR`, tout ce qui n'est
-que forme se retire :
+que forme se retire — et la jauge garde ses sept crans de densité, faute de
+rainure :
 
 ```
 Pro Opus 5 xhigh …\_plus-rust_ ctx 34% · 5h ▒░ 20% → 41% 15:00 · 7j █░ 45%
@@ -36,11 +37,14 @@ Pro Opus 5 xhigh …\_plus-rust_ ctx 34% · 5h ▒░ 20% → 41% 15:00 · 7j �
 | Modèle, fenêtre au-delà de 200 k, effort, marqueurs `fast` / `sans réflexion` | payload |
 | Emplacement relatif au projet (`…\feuille` au-delà d'un sous-dossier), branche Git | payload, `.git/HEAD` |
 | Contexte occupé | payload, paliers 80 / 90 % |
-| Fenêtre 5 h : jauge, valeur, projection à la remise à zéro ou `épuisé`, heure | payload + rythme mesuré, mémorisé dans un cache |
-| Fenêtre 7 j : jauge, valeur, marqueurs `~` (mémorisée) et `≈` (estimée) | la plus remplie de la fenêtre globale et de la fenêtre propre au modèle relevée par `/usage` ; seuils selon la famille du modèle |
+| Fenêtre 5 h : jauge fine, valeur, projection à la remise à zéro ou `épuisé`, heure | payload + rythme mesuré, mémorisé dans un cache |
+| Fenêtre 7 j : jauge fine, valeur, marqueurs `~` (mémorisée) et `≈` (estimée) | la plus remplie de la fenêtre globale et de la fenêtre propre au modèle relevée par `/usage` ; seuils selon la famille du modèle |
 
-Les compartiments prennent le fond du pire palier atteint — ardoise, ambre
-sombre à l'alerte, rouge sombre au critique. Chaque segment absent se retire
+Chaque mesure prend le fond de son propre palier — ardoise, ambre sombre à
+l'alerte, rouge sombre au critique — et son cadre l'encre de ses valeurs ;
+l'arc entre deux mesures prend celle de la plus grave. La jauge des fenêtres
+compte seize crans sur deux cellules, en huitièmes de bloc sur une rainure.
+Chaque segment absent se retire
 de lui-même ; la ligne n'est jamais vide et le programme rend toujours 0 : une
 sortie vide effacerait la ligne dans l'interface, ce qui est pire qu'une
 information partielle.
@@ -48,8 +52,9 @@ information partielle.
 ## Installation
 
 Prérequis : Windows 10 ou 11. Windows Terminal est conseillé : il trace
-lui-même les arcs Powerline (`U+E0B5`, `U+E0B7`) et les blocs du cadre, sans
-police particulière.
+lui-même les arcs Powerline (`U+E0B5`, `U+E0B7`), les blocs du cadre et les
+huitièmes de la jauge (`▏` à `▉`, absents de Consolas), sans police
+particulière.
 
 Sans compiler : la dernière Release porte le binaire x64,
 [`statusline.exe`](https://github.com/gnash1971/statusline/releases/latest/download/statusline.exe),
@@ -108,7 +113,8 @@ binaire a une autre forme — fonds, caps, cadre — et le harnais compare les d
 sous `NO_COLOR`, où elle est, octet pour octet, celle du script. Les cas
 colorés sont couverts par les tests du crate. Seule exception : les deux
 retouches de la 2.3.0 changent la sortie sous `NO_COLOR`, et ont donc été
-portées dans l'oracle à l'identique.
+portées dans l'oracle à l'identique. La 2.4.0, elle, ne change rien sous
+`NO_COLOR` : l'oracle n'a pas bougé.
 
 La CI (`.github/workflows/ci.yml`) rejoue `cargo test`, `cargo build
 --release`, `cargo fmt --check` et `cargo clippy --all-targets -- -D warnings`
@@ -132,12 +138,14 @@ signature exigée) ; les commits et les tags sont signés.
 
 ## État
 
-Version 2.3.0 — le segment de version est retiré, avec la lecture des
-métadonnées de `claude.exe` qui le servait, et l'emplacement se replie en
-`…\feuille` dès qu'il descend plus bas qu'un sous-dossier du projet. 2.2.1
-avait borné la lecture de ce bloc de version (une alerte CodeQL fermée par le
-code plutôt qu'écartée), 2.2.0 apporté la capsule cadrée sur trois rangs. L'histoire, les mesures et les décisions sont dans
-`docs/statusline-rust.md`.
+Version 2.4.0 — les mesures se lisent une à une : chacune prend le fond et le
+cadre de son propre palier, là où le pire des trois teintait le compartiment
+entier, et la jauge des fenêtres passe de sept à seize crans, en huitièmes de
+bloc sur une rainure. Largeur inchangée, sortie `NO_COLOR` identique. 2.3.0
+avait retiré le segment de version et replié l'emplacement en `…\feuille`,
+2.2.1 borné la lecture du bloc de version (une alerte CodeQL fermée par le code
+plutôt qu'écartée), 2.2.0 apporté la capsule cadrée sur trois rangs.
+L'histoire, les mesures et les décisions sont dans `docs/statusline-rust.md`.
 
 ## Licence
 
